@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{BBD4CE82-846E-4E05-8802-4B87E116EBF9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MenuSystem", "MenuSystem\MenuSystem.csproj", "{BE58DC79-3E50-40B3-96CA-617E931EA5CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{BBD4CE82-846E-4E05-8802-4B87E116EBF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBD4CE82-846E-4E05-8802-4B87E116EBF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBD4CE82-846E-4E05-8802-4B87E116EBF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE58DC79-3E50-40B3-96CA-617E931EA5CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE58DC79-3E50-40B3-96CA-617E931EA5CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE58DC79-3E50-40B3-96CA-617E931EA5CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE58DC79-3E50-40B3-96CA-617E931EA5CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
