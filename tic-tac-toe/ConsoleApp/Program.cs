@@ -1,59 +1,59 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using MenuSystem;
 
-using MenuSystem;
+var deepMenu = new Menu(
+    EMenuLevel.Deep,
+    "TIC-TAC-TOE DEEP", [
+        new MenuItem()
+        {
+            Shortcut = "Y",
+            Title = "YYYYYYY",
+            MenuItemAction = DummyMethod
+        },
+    ]
+);
 
-var mainMenu = new Menu("TIC-TAC-TOE", [
-    new MenuItem()
-    {
-        Shortcut = "O",
-        Title = "Options",
-    },
+var optionsMenu = new Menu(
+    EMenuLevel.Secondary,
+    "TIC-TAC-TOE Options", [
+        new MenuItem()
+        {
+            Shortcut = "X",
+            Title = "X Starts",
+            MenuItemAction = deepMenu.Run
+        },
+        new MenuItem()
+        {
+            Shortcut = "O",
+            Title = "O Starts",
+            MenuItemAction = DummyMethod
+        },
+    ]);
 
-    new MenuItem()
-    {
-        Shortcut = "N",
-        Title = "New game",
-    }
-
-]);
+var mainMenu = new Menu(
+    EMenuLevel.Main,
+    "TIC-TAC-TOE", [
+        new MenuItem()
+        {
+            Shortcut = "O",
+            Title = "Options",
+            MenuItemAction = optionsMenu.Run
+        },
+        new MenuItem()
+        {
+            Shortcut = "N",
+            Title = "New game",
+            MenuItemAction = DummyMethod
+        }
+    ]);
 
 mainMenu.Run();
 
 return;
-// ======================================
+// ========================================
 
-static void MenuMain()
+string DummyMethod()
 {
-    MenuStart();
-    
-    Console.WriteLine("O) Options");
-    Console.WriteLine("N) New game");
-    Console.WriteLine("L) Load game");
-    Console.WriteLine("E) Exit");
-
-    MenuEnd();
+    Console.Write("Just press any key to get out from here! (Any key - as a random choice from keyboard....)");
+    Console.ReadKey();
+    return "foobar";
 }
-
-static void MenuOptions()
-{
-    MenuStart();
-    
-    Console.WriteLine("Choose symbol for player one (X)");
-    Console.WriteLine("Choose symbol for player two (O)");
-    
-    MenuEnd();
-}
-
-static void MenuStart()
-{
-    Console.WriteLine("TIC-TAC-TOE");
-    Console.WriteLine("=======================");
-}
-
-static void MenuEnd()
-{
-    Console.WriteLine();
-    Console.Write(">");
-}
-
-

@@ -2,8 +2,10 @@
 
 public class MenuItem
 {
-    private string _title;
-    private string _shortcut;
+    private string _title = default!;
+    private string _shortcut = default!;
+
+    public Func<string>? MenuItemAction { get; set; }
 
     public string Title
     {
@@ -15,7 +17,7 @@ public class MenuItem
                 throw new ArgumentException("Title cannot be empty");
             }
             _title = value;
-        }
+        } 
     }
 
     public string Shortcut
