@@ -9,6 +9,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "!Solution items", "!Solutio
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBrain", "GameBrain\GameBrain.csproj", "{994AA780-433A-4AE8-9573-6FCF0A67E1E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleUI", "ConsoleUI\ConsoleUI.csproj", "{2B278DCC-9E90-463F-B2F8-42432F7BD16B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,5 +27,13 @@ Global
 		{BE58DC79-3E50-40B3-96CA-617E931EA5CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE58DC79-3E50-40B3-96CA-617E931EA5CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE58DC79-3E50-40B3-96CA-617E931EA5CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{994AA780-433A-4AE8-9573-6FCF0A67E1E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{994AA780-433A-4AE8-9573-6FCF0A67E1E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{994AA780-433A-4AE8-9573-6FCF0A67E1E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{994AA780-433A-4AE8-9573-6FCF0A67E1E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B278DCC-9E90-463F-B2F8-42432F7BD16B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B278DCC-9E90-463F-B2F8-42432F7BD16B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B278DCC-9E90-463F-B2F8-42432F7BD16B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B278DCC-9E90-463F-B2F8-42432F7BD16B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
