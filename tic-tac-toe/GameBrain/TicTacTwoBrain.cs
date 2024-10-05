@@ -1,20 +1,17 @@
 namespace GameBrain;
 
-public class TicTacToeBrain
+public class TicTacTwoBrain
 {
     private EGamePiece[,] _gameBoard;
     private EGamePiece _nextMoveBy { get; set; } = EGamePiece.X;
 
-    public TicTacToeBrain() : this(3)
-    {
-    }
-    public TicTacToeBrain(int boardSize) : this(boardSize, boardSize)
-    {
-    }
+    private GameConfiguration _gameConfiguration;
 
-    private TicTacToeBrain(int boardX, int boardY)
+
+    public TicTacTwoBrain(GameConfiguration gameConfiguration)
     {
-        _gameBoard = new EGamePiece[boardX, boardY];
+        _gameConfiguration = gameConfiguration;
+        _gameBoard = new EGamePiece[_gameConfiguration.BoardSizeWidth, _gameConfiguration.BoardSizeHeight];
     }
 
 
@@ -62,4 +59,5 @@ public class TicTacToeBrain
         _gameBoard = new EGamePiece[_gameBoard.GetLength(0), _gameBoard.GetLength(1)];
         _nextMoveBy = EGamePiece.X;
     }
+
 }

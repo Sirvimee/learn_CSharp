@@ -4,7 +4,7 @@ namespace ConsoleUI;
 
 public static class Visualizer
 {
-    public static void DrawBoard(TicTacToeBrain gameInstance)
+    public static void DrawBoard(TicTacTwoBrain gameInstance)
     {
         for (var y = 0; y < gameInstance.DimY; y++)
         {
