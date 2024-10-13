@@ -6,15 +6,16 @@ public record struct GameConfiguration()
     
     public int BoardSizeWidth { get; set; } = 3;
     public int BoardSizeHeight { get; set; } = 3;
+    public int GridSizeWidth { get; set; } = 3;
+    public int GridSizeHeight { get; set; } = 3;
 
-    // how many pieces in straight to win the game
     public int WinCondition { get; set; } = 3;
-
-    // 0 disabled
     public int MovePieceAfterNMoves { get; set; } = 0;
+
+    public string BoardType { get; set; } = "Default"; 
 
     public override string ToString() =>
         $"Board {BoardSizeWidth}x{BoardSizeHeight}, " +
-        "to win: {WinCondition}, " +
-        "can move piece after {MovePieceAfterNMoves} moves";
+        $"to win: {WinCondition}, " +
+        $"can move piece after {MovePieceAfterNMoves} moves";
 }

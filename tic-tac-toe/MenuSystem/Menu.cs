@@ -11,7 +11,7 @@ public class Menu
         Shortcut = "E",
         Title = "Exit"
     };
-    
+
     private MenuItem _menuItemReturn = new MenuItem()
     {
         Shortcut = "R",
@@ -49,27 +49,37 @@ public class Menu
         MenuItems = menuItems;
         _isCustomMenu = isCustomMenu;
         _menuLevel = menuLevel;
-        
-        
+
         if (_menuLevel != EMenuLevel.Main)
         {
             MenuItems.Add(_menuItemReturn);
         }
-        
+
         if (_menuLevel == EMenuLevel.Deep)
         {
             MenuItems.Add(_menuItemReturnMain);
         }
 
         MenuItems.Add(_menuItemExit);
+
+        ValidateMenuItems();
         
-        
-        // TODO: validate menu items for shortcut conflict!
+    }
+
+    private void ValidateMenuItems()
+    {
+        var shortcuts = new HashSet<string>();
+        foreach (var item in MenuItems)
+        {
+            if (!shortcuts.Add(item.Shortcut.ToUpper()))
+            {
+                throw new ApplicationException($"Duplicate shortcut found: {item.Shortcut}");
+            }
+        }
     }
 
     public string Run()
     {
-        
         Console.Clear();
         do
         {
@@ -86,14 +96,14 @@ public class Menu
             {
                 return menuItem.Shortcut;
             }
-            
+
             if (menuItem.Shortcut == _menuItemExit.Shortcut || menuReturnValue == _menuItemExit.Shortcut)
             {
                 return _menuItemExit.Shortcut;
             }
 
-            if ((menuItem.Shortcut == _menuItemReturnMain.Shortcut 
-                 || menuReturnValue == _menuItemReturnMain.Shortcut) 
+            if ((menuItem.Shortcut == _menuItemReturnMain.Shortcut
+                 || menuReturnValue == _menuItemReturnMain.Shortcut)
                 && _menuLevel != EMenuLevel.Main)
             {
                 return _menuItemReturnMain.Shortcut;
@@ -111,7 +121,7 @@ public class Menu
             DrawMenu();
 
             userInput = Console.ReadLine();
-            
+
             if (string.IsNullOrWhiteSpace(userInput))
             {
                 Console.WriteLine("It would be nice, if you actually choose something!!! Try again... Maybe...");
@@ -120,7 +130,7 @@ public class Menu
             else
             {
                 userInput = userInput.ToUpper();
-                
+
                 foreach (var menuItem in MenuItems)
                 {
                     if (menuItem.Shortcut.ToUpper() != userInput) continue;
@@ -142,7 +152,7 @@ public class Menu
         {
             Console.WriteLine(t);
         }
-        
+
         Console.WriteLine();
 
         Console.Write(">");

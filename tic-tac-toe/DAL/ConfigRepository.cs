@@ -8,15 +8,25 @@ public class ConfigRepository
     {
         new GameConfiguration()
         {
-            Name = "Classical"
+            Name = "Classical",
+            BoardSizeWidth = 5,
+            BoardSizeHeight = 5,
+            GridSizeHeight = 3,
+            GridSizeWidth = 3,
+            WinCondition = 3,
+            MovePieceAfterNMoves = 2,
+            BoardType = "Classical"
         },
         new GameConfiguration()
         {
             Name = "Big board",
             BoardSizeWidth = 10,
             BoardSizeHeight = 10,
+            GridSizeHeight = 4,
+            GridSizeWidth = 4,
             WinCondition = 4,
             MovePieceAfterNMoves = 3,
+            BoardType = "Big board"
         },
     };
 

@@ -1,59 +1,100 @@
 using MenuSystem;
+using GameBrain;
+using DAL;
 
-namespace ConsoleApp;
-
-public static class Menus
+namespace ConsoleApp
 {
-    public static readonly Menu DeepMenu = new Menu(
-        EMenuLevel.Deep,
-        "TIC-TAC-TWO DEEP", [
-            new MenuItem()
-            {
-                Shortcut = "N",
-                Title = "NOPE",
-            }
-        ]
-    );
-
-    public static readonly Menu OptionsMenu =
-        new Menu(
-            EMenuLevel.Secondary,
-            "TIC-TAC-TWO Options", [
-                new MenuItem()
-                {
-                    Shortcut = "X",
-                    Title = "X Starts",
-                    MenuItemAction = DeepMenu.Run
-                },
-                new MenuItem()
-                {
-                    Shortcut = "O",
-                    Title = "O Starts",
-                    MenuItemAction = DummyMethod
-                },
-            ]);
-
-    public static Menu MainMenu = new Menu(
-        EMenuLevel.Main,
-        "TIC-TAC-TWO", [
-            new MenuItem()
-            {
-                Shortcut = "O",
-                Title = "Options",
-                MenuItemAction = OptionsMenu.Run
-            },
-            new MenuItem()
-            {
-                Shortcut = "N",
-                Title = "New game",
-                MenuItemAction = GameController.MainLoop
-            }
-        ]);
-
-    private static string DummyMethod()
+    public static class Menus
     {
-        Console.Write("Just press any key to get out from here! (Any key - as a random choice from keyboard....)");
-        Console.ReadKey();
-        return "foobar";
+        private static readonly ConfigRepository ConfigRepo = new ConfigRepository();
+
+        public static readonly Menu GameConfigMenu = new Menu(
+            EMenuLevel.Deep,
+            "Choose Game Configuration", new List<MenuItem>
+            {
+                new MenuItem
+                {
+                    Shortcut = "B",
+                    Title = "Big board",
+                    MenuItemAction = () =>
+                    {
+                        var config = ConfigRepo.GetConfigurationByName("Big board");
+                        GameController.SetSelectedGameConfiguration(config);
+                        return GameController.StartGame();
+                    }
+                },
+                new MenuItem
+                {
+                    Shortcut = "C",
+                    Title = "Classical",
+                    MenuItemAction = () =>
+                    {
+                        var config = ConfigRepo.GetConfigurationByName("Classical");
+                        GameController.SetSelectedGameConfiguration(config);
+                        return GameController.StartGame();
+                    }
+                }
+            });
+
+        public static readonly Menu GameTypeMenu = new Menu(
+            EMenuLevel.Secondary,
+            "Choose Game Type", new List<MenuItem>
+            {
+                new MenuItem
+                {
+                    Shortcut = "1",
+                    Title = "Player vs Player",
+                    MenuItemAction = () =>
+                    {
+                        GameController.SetSelectedGameType("Player vs Player");
+                        return GameConfigMenu.Run();
+                    }
+                },
+                new MenuItem
+                {
+                    Shortcut = "2",
+                    Title = "Player vs AI",
+                    MenuItemAction = () =>
+                    {
+                        GameController.SetSelectedGameType("Player vs AI");
+                        return GameConfigMenu.Run();
+                    }
+                },
+                new MenuItem
+                {
+                    Shortcut = "3",
+                    Title = "AI vs AI",
+                    MenuItemAction = () =>
+                    {
+                        GameController.SetSelectedGameType("AI vs AI");
+                        return GameConfigMenu.Run();
+                    }
+                }
+            });
+
+        public static readonly Menu MainMenu = new Menu(
+            EMenuLevel.Main,
+            "Welcome to Tic-Tac-Two!", new List<MenuItem>
+            {
+                new MenuItem
+                {
+                    Shortcut = "N",
+                    Title = "New Game",
+                    MenuItemAction = GameTypeMenu.Run
+                },
+                new MenuItem
+                {
+                    Shortcut = "S",
+                    Title = "Saved Game",
+                    MenuItemAction = DummyMethod // TODO Replace with actual saved game loading method
+                }
+            });
+
+        private static string DummyMethod()
+        {
+            Console.Write("Just press any key to get out from here! (Any key - as a random choice from keyboard....)");
+            Console.ReadKey();
+            return "foobar";
+        }
     }
 }
