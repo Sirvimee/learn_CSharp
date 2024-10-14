@@ -95,7 +95,7 @@ public static class GameController
         return "Game over";
     }
 
-    private static void HandlePlayerTurn(TicTacTwoBrain gameInstance)
+    private static bool HandlePlayerTurn(TicTacTwoBrain gameInstance)
     {
         Console.WriteLine("Choose action: (1) Place piece, (2) Move grid, (3) Move piece, (S) Save game, (E) Exit game");
         string? action = Console.ReadLine();
@@ -103,84 +103,99 @@ public static class GameController
         switch (action?.ToUpper())
         {
             case "1":
-                HandlePlacePiece(gameInstance);
-                break;
+                return HandlePlacePiece(gameInstance);
             case "2":
-                HandleMoveGrid(gameInstance);
-                break;
+                return HandleMoveGrid(gameInstance);
             case "3":
-                HandleMovePiece(gameInstance);
-                break;
+                return HandleMovePiece(gameInstance);
             case "S":
                 HandleSaveGame(gameInstance);
-                break;
+                return true; 
             case "E":
                 Environment.Exit(0);
-                break;
+                return true; 
             default:
                 Console.WriteLine("Invalid choice. Try again.");
-                break;
+                return false;
         }
     }
-
-    private static void HandlePlacePiece(TicTacTwoBrain gameInstance)
+    
+    private static bool HandlePlacePiece(TicTacTwoBrain gameInstance)
+{
+    Console.WriteLine("Enter row and column to place piece (e.g., 2 2):");
+    var input = Console.ReadLine()?.Split();
+    if (input?.Length == 2 &&
+        int.TryParse(input[0], out int row) &&
+        int.TryParse(input[1], out int col))
     {
-        Console.WriteLine("Enter row and column to place piece (e.g., 2 2):");
-        var input = Console.ReadLine()?.Split();
-        if (input?.Length == 2 &&
-            int.TryParse(input[0], out int row) &&
-            int.TryParse(input[1], out int col))
+        if (gameInstance.MakeAMove(row, col))
         {
-            if (!gameInstance.MakeAMove(row, col))
-            {
-                Console.WriteLine("Invalid move, try again.");
-            }
+            return true;
         }
         else
         {
-            Console.WriteLine("Invalid input.");
+            Console.WriteLine("Invalid move, try again.");
+            return false;
         }
     }
-
-    private static void HandleMoveGrid(TicTacTwoBrain gameInstance)
+    else
     {
-        Console.WriteLine("Enter grid move offset (e.g., -1 0 for up):");
-        var input = Console.ReadLine()?.Split();
-        if (input?.Length == 2 &&
-            int.TryParse(input[0], out int rowOffset) &&
-            int.TryParse(input[1], out int colOffset))
+        Console.WriteLine("Invalid input.");
+        return false;
+    }
+}
+
+private static bool HandleMoveGrid(TicTacTwoBrain gameInstance)
+{
+    Console.WriteLine("Enter grid move offset (e.g., -1 0 for up):");
+    var input = Console.ReadLine()?.Split();
+    if (input?.Length == 2 &&
+        int.TryParse(input[0], out int rowOffset) &&
+        int.TryParse(input[1], out int colOffset))
+    {
+        if (gameInstance.MoveGrid(rowOffset, colOffset))
         {
-            if (!gameInstance.MoveGrid(rowOffset, colOffset))
-            {
-                Console.WriteLine("Invalid grid movement.");
-            }
+            return true;
         }
         else
         {
-            Console.WriteLine("Invalid input.");
+            Console.WriteLine("Invalid grid movement.");
+            return false;
         }
     }
-
-    private static void HandleMovePiece(TicTacTwoBrain gameInstance)
+    else
     {
-        Console.WriteLine("Enter source row/col and destination row/col (e.g., 1 1 2 2):");
-        var input = Console.ReadLine()?.Split();
-        if (input?.Length == 4 &&
-            int.TryParse(input[0], out int fromRow) &&
-            int.TryParse(input[1], out int fromCol) &&
-            int.TryParse(input[2], out int toRow) &&
-            int.TryParse(input[3], out int toCol))
+        Console.WriteLine("Invalid input.");
+        return false;
+    }
+}
+
+private static bool HandleMovePiece(TicTacTwoBrain gameInstance)
+{
+    Console.WriteLine("Enter source row/col and destination row/col (e.g., 1 1 2 2):");
+    var input = Console.ReadLine()?.Split();
+    if (input?.Length == 4 &&
+        int.TryParse(input[0], out int fromRow) &&
+        int.TryParse(input[1], out int fromCol) &&
+        int.TryParse(input[2], out int toRow) &&
+        int.TryParse(input[3], out int toCol))
+    {
+        if (gameInstance.MovePiece(fromRow, fromCol, toRow, toCol))
         {
-            if (!gameInstance.MovePiece(fromRow, fromCol, toRow, toCol))
-            {
-                Console.WriteLine("Invalid piece movement.");
-            }
+            return true;
         }
         else
         {
-            Console.WriteLine("Invalid input.");
+            Console.WriteLine("Invalid piece movement.");
+            return false;
         }
     }
+    else
+    {
+        Console.WriteLine("Invalid input.");
+        return false;
+    }
+}
     
     private static void HandleSaveGame(TicTacTwoBrain gameInstance)
     {

@@ -12,10 +12,11 @@ public static class Visualizer
         {
             for (var x = 0; x < gameInstance.DimX; x++)
             {
-                if ((config.BoardType == "Classical" && x >= 1 && x <= 2 && y >= 1 && y <= 3) ||
-                    (config.BoardType == "Big board" && x >= 3 && x <= 5 && y >= 3 && y <= 6))
+                if (x >= gameInstance.SmallBoardPosX && x < gameInstance.SmallBoardPosX + gameInstance.SmallBoardWidth &&
+                    y >= gameInstance.SmallBoardPosY && y < gameInstance.SmallBoardPosY + gameInstance.SmallBoardHeight)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.BackgroundColor = ConsoleColor.Cyan;
+                    Console.ForegroundColor = ConsoleColor.Black;
                 }
                 else
                 {
@@ -29,36 +30,26 @@ public static class Visualizer
 
             Console.WriteLine();
             if (y == gameInstance.DimY - 1) continue;
+
             for (var x = 0; x < gameInstance.DimX; x++)
             {
-                if ((config.BoardType == "Classical" && x >= 1 && x <= 3 && y >= 1 && y <= 2) ||
-                    (config.BoardType == "Big board" && x >= 3 && x <= 5 && y >= 2 && y <= 6))
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                }
-                else
-                {
-                    Console.ResetColor();
-                }
-
                 Console.Write("---");
                 if (x != gameInstance.DimX - 1)
                 {
                     Console.Write("+");
                 }
             }
-
             Console.WriteLine();
         }
 
         Console.ResetColor();
     }
 
-    private static string DrawGamePiece(EGamePiece piece) =>
+    private static string DrawGamePiece(char piece) =>
         piece switch
         {
-            EGamePiece.O => "O",
-            EGamePiece.X => "X",
+            'O' => "O",
+            'X' => "X",
             _ => " "
         };
 }

@@ -2,78 +2,65 @@ namespace GameBrain;
 
 public class TicTacTwoBrain
 {
-    private EGamePiece[,] _gameBoard;
-    private EGamePiece _nextMoveBy { get; set; } = EGamePiece.X;
-    private int _centerX;
-    private int _centerY;
+    public int DimX { get; set; }
+    public int DimY { get; set; }
+    public char[,] GameBoard { get; set; }
+    public bool IsXTurn { get; set; }
 
-    public GameConfiguration Configuration { get; private set; }
+    public int SmallBoardPosX { get; set; }
+    public int SmallBoardPosY { get; set; }
+    public int SmallBoardWidth { get; set; }
+    public int SmallBoardHeight { get; set; }
 
-    public TicTacTwoBrain(GameConfiguration gameConfiguration)
+    public GameConfiguration Configuration { get; }
+
+    public TicTacTwoBrain(GameConfiguration config)
     {
-        Configuration = gameConfiguration;
-        _gameBoard = new EGamePiece[Configuration.BoardSizeWidth, Configuration.BoardSizeHeight];
-        _centerX = Configuration.BoardSizeWidth / 2;
-        _centerY = Configuration.BoardSizeHeight / 2;
-    }
+        Configuration = config;
+        DimX = config.BoardSizeWidth;
+        DimY = config.BoardSizeHeight;
+        GameBoard = new char[DimX, DimY];
+        IsXTurn = true;
 
-    public EGamePiece[,] GameBoard => GetBoard();
-    public int DimX => _gameBoard.GetLength(0);
-    public int DimY => _gameBoard.GetLength(1);
-    public bool IsXTurn { get; set; } = true;
+        SmallBoardWidth = config.GridSizeWidth;
+        SmallBoardHeight = config.GridSizeHeight;
 
-    private EGamePiece[,] GetBoard()
-    {
-        var copyOfBoard = new EGamePiece[_gameBoard.GetLength(0), _gameBoard.GetLength(1)];
-        for (var x = 0; x < _gameBoard.GetLength(0); x++)
+        // Set SmallBoard position to the center of the BigBoard
+        SmallBoardPosX = (DimX - SmallBoardWidth) / 2;
+        SmallBoardPosY = (DimY - SmallBoardHeight) / 2;
+
+        for (var i = 0; i < DimX; i++)
         {
-            for (var y = 0; y < _gameBoard.GetLength(1); y++)
+            for (var j = 0; j < DimY; j++)
             {
-                copyOfBoard[x, y] = _gameBoard[x, y];
+                GameBoard[i, j] = '.';
             }
         }
-        return copyOfBoard;
     }
 
-    public bool MakeAMove(int x, int y)
+    public bool MakeAMove(int row, int col)
     {
-        if (_gameBoard[x, y] != EGamePiece.Empty)
+        if (GameBoard[row, col] == '.')
         {
-            return false;
+            GameBoard[row, col] = IsXTurn ? 'X' : 'O';
+            return true;
         }
-
-        _gameBoard[x, y] = _nextMoveBy;
-        _nextMoveBy = _nextMoveBy == EGamePiece.X ? EGamePiece.O : EGamePiece.X;
-        return true;
+        return false;
     }
 
-    public bool MovePiece(int fromX, int fromY, int toX, int toY)
+    public bool MoveGrid(int rowOffset, int colOffset)
     {
-        if (_gameBoard[fromX, fromY] != _nextMoveBy || _gameBoard[toX, toY] != EGamePiece.Empty)
+        int newPosX = SmallBoardPosX + colOffset;
+        int newPosY = SmallBoardPosY + rowOffset;
+
+        if (newPosX >= 0 && newPosX + SmallBoardWidth <= DimX &&
+            newPosY >= 0 && newPosY + SmallBoardHeight <= DimY)
         {
-            return false;
+            SmallBoardPosX = newPosX;
+            SmallBoardPosY = newPosY;
+            return true;
         }
-
-        _gameBoard[toX, toY] = _gameBoard[fromX, fromY];
-        _gameBoard[fromX, fromY] = EGamePiece.Empty;
-        _nextMoveBy = _nextMoveBy == EGamePiece.X ? EGamePiece.O : EGamePiece.X;
-        return true;
-    }
-
-    public bool MoveGrid(int deltaX, int deltaY)
-    {
-        int newCenterX = _centerX + deltaX;
-        int newCenterY = _centerY + deltaY;
-
-        if (newCenterX < 0 || newCenterX >= DimX || newCenterY < 0 || newCenterY >= DimY)
-        {
-            return false;
-        }
-
-        _centerX = newCenterX;
-        _centerY = newCenterY;
-        _nextMoveBy = _nextMoveBy == EGamePiece.X ? EGamePiece.O : EGamePiece.X;
-        return true;
+        return false;
     }
 
     public bool CheckWin()
@@ -82,12 +69,8 @@ public class TicTacTwoBrain
         return false;
     }
 
-    public void ResetGame()
+    public bool MovePiece(int fromRow, int fromCol, int toRow, int toCol)
     {
-        _gameBoard = new EGamePiece[_gameBoard.GetLength(0), _gameBoard.GetLength(1)];
-        _nextMoveBy = EGamePiece.X;
-        _centerX = Configuration.BoardSizeWidth / 2;
-        _centerY = Configuration.BoardSizeHeight / 2;
+        throw new NotImplementedException();
     }
-    
 }
