@@ -12,6 +12,9 @@ public class TicTacTwoBrain
     public int SmallBoardWidth { get; set; }
     public int SmallBoardHeight { get; set; }
 
+    public int XMoveCount { get; set; }
+    public int OMoveCount { get; set; }
+
     public GameConfiguration Configuration { get; }
 
     public TicTacTwoBrain(GameConfiguration config)
@@ -40,12 +43,24 @@ public class TicTacTwoBrain
 
     public bool MakeAMove(int row, int col)
     {
+        if (row < 0 || row >= DimX || col < 0 || col >= DimY)
+        {
+            Console.WriteLine("Invalid move. Try again.");
+            return false;
+        }
+
         if (GameBoard[row, col] == '.')
         {
             GameBoard[row, col] = IsXTurn ? 'X' : 'O';
+            if (IsXTurn) XMoveCount++;
+            else OMoveCount++;
             return true;
         }
-        return false;
+        else
+        {
+            Console.WriteLine("Invalid move. Try again.");
+            return false;
+        }
     }
 
     public bool MoveGrid(int rowOffset, int colOffset)
@@ -62,15 +77,131 @@ public class TicTacTwoBrain
         }
         return false;
     }
-
+    
+    //TODO: Repair this method, now it's not working properly
     public bool CheckWin()
     {
-        // Implement win condition check logic here
+        int winCondition = Configuration.Name == "Classical" ? 3 : 4;
+        char currentPlayerPiece = IsXTurn ? 'X' : 'O';
+        
+        for (int row = SmallBoardPosY; row < SmallBoardPosY + SmallBoardHeight; row++)
+        {
+            for (int col = SmallBoardPosX; col <= SmallBoardPosX + SmallBoardWidth - winCondition; col++)
+            {
+                bool win = true;
+                for (int k = 0; k < winCondition; k++)
+                {
+                    if (GameBoard[row, col + k] != currentPlayerPiece)
+                    {
+                        win = false;
+                        break;
+                    }
+                }
+                if (win)
+                {
+                    Console.WriteLine("Horizontal win detected.");
+                    return true;
+                }
+            }
+        }
+        
+        for (int col = SmallBoardPosX; col < SmallBoardPosX + SmallBoardWidth; col++)
+        {
+            for (int row = SmallBoardPosY; row <= SmallBoardPosY + SmallBoardHeight - winCondition; row++)
+            {
+                bool win = true;
+                for (int k = 0; k < winCondition; k++)
+                {
+                    if (GameBoard[row + k, col] != currentPlayerPiece)
+                    {
+                        win = false;
+                        break;
+                    }
+                }
+                if (win)
+                {
+                    Console.WriteLine("Vertical win detected.");
+                    return true;
+                }
+            }
+        }
+        
+        for (int row = SmallBoardPosY; row <= SmallBoardPosY + SmallBoardHeight - winCondition; row++)
+        {
+            for (int col = SmallBoardPosX; col <= SmallBoardPosX + SmallBoardWidth - winCondition; col++)
+            {
+                bool win = true;
+                for (int k = 0; k < winCondition; k++)
+                {
+                    if (GameBoard[row + k, col + k] != currentPlayerPiece)
+                    {
+                        win = false;
+                        break;
+                    }
+                }
+                if (win)
+                {
+                    Console.WriteLine("Diagonal win (top-left to bottom-right) detected.");
+                    return true;
+                }
+            }
+        }
+        
+        for (int row = SmallBoardPosY + winCondition - 1; row < SmallBoardPosY + SmallBoardHeight; row++)
+        {
+            for (int col = SmallBoardPosX; col <= SmallBoardPosX + SmallBoardWidth - winCondition; col++)
+            {
+                bool win = true;
+                for (int k = 0; k < winCondition; k++)
+                {
+                    if (GameBoard[row - k, col + k] != currentPlayerPiece)
+                    {
+                        win = false;
+                        break;
+                    }
+                }
+                if (win)
+                {
+                    Console.WriteLine("Diagonal win (bottom-left to top-right) detected.");
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
+
     public bool MovePiece(int fromRow, int fromCol, int toRow, int toCol)
     {
-        throw new NotImplementedException();
+        if (fromRow < 0 || fromRow >= DimX || fromCol < 0 || fromCol >= DimY)
+        {
+            Console.WriteLine("Invalid source coordinates. Try again.");
+            return false;
+        }
+        
+        if (toRow < 0 || toRow >= DimX || toCol < 0 || toCol >= DimY)
+        {
+            Console.WriteLine("Invalid destination coordinates. Try again.");
+            return false;
+        }
+        
+        char currentPlayerPiece = IsXTurn ? 'X' : 'O';
+        if (GameBoard[fromRow, fromCol] != currentPlayerPiece)
+        {
+            Console.WriteLine("You can only move your own piece. Try again.");
+            return false;
+        }
+        
+        if (GameBoard[toRow, toCol] != '.')
+        {
+            Console.WriteLine("Destination cell is not empty. Try again.");
+            return false;
+        }
+        
+        GameBoard[fromRow, fromCol] = '.';
+        GameBoard[toRow, toCol] = currentPlayerPiece;
+
+        return true;
     }
 }

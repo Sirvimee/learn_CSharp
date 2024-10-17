@@ -25,7 +25,7 @@ public class ConfigRepository
             GridSizeHeight = 4,
             GridSizeWidth = 4,
             WinCondition = 4,
-            MovePieceAfterNMoves = 3,
+            MovePieceAfterNMoves = 2,
             BoardType = "Big board"
         },
     };
@@ -42,4 +42,5 @@ public class ConfigRepository
     {
         return _gameConfigurations.Single(c => c.Name == name);
     }
+    
 }

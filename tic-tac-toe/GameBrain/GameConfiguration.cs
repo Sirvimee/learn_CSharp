@@ -2,7 +2,7 @@ namespace GameBrain;
 
 public record struct GameConfiguration()
 {
-    public string Name { get; set; } = default!;
+    public string Name { get; set; } = "Default";
     
     public int BoardSizeWidth { get; set; } = 3;
     public int BoardSizeHeight { get; set; } = 3;
@@ -13,6 +13,7 @@ public record struct GameConfiguration()
     public int MovePieceAfterNMoves { get; set; } = 0;
 
     public string BoardType { get; set; } = "Default"; 
+    
 
     public override string ToString() =>
         $"Board {BoardSizeWidth}x{BoardSizeHeight}, " +

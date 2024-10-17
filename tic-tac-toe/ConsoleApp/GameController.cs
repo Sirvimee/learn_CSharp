@@ -29,24 +29,35 @@ public static class GameController
         while (true)
         {
             Visualizer.DrawBoard(game);
+            Console.WriteLine($"Game Mode: {SelectedGameConfiguration.Name}");
 
             if (game.IsXTurn)
             {
                 Console.WriteLine("Player X's turn.");
-                HandlePlayerTurn(game);
-                game.IsXTurn = false;
+                var result = HandlePlayerTurn(game);
+                if (result == "RETURN") return "Returned to main menu";
+                if (result == "CONTINUE") game.IsXTurn = false;
             }
             else
             {
                 Console.WriteLine("Player O's turn.");
-                HandlePlayerTurn(game);
-                game.IsXTurn = true;
+                var result = HandlePlayerTurn(game);
+                if (result == "RETURN") return "Returned to main menu";
+                if (result == "CONTINUE") game.IsXTurn = true;
             }
 
             if (game.CheckWin())
             {
-                // Console.WriteLine($"Player {game.GetWinner()} wins!");
                 Visualizer.DrawBoard(game);
+                Console.WriteLine($"Player {(game.IsXTurn ? "O" : "X")} wins!");
+                break;
+            }
+
+            // Check for draw condition
+            if (game.XMoveCount + game.OMoveCount == game.DimX * game.DimY)
+            {
+                Visualizer.DrawBoard(game);
+                Console.WriteLine("The game is a draw!");
                 break;
             }
         }
@@ -56,74 +67,95 @@ public static class GameController
 
     public static string MainLoop()
     {
-        var chosenConfigShortcut = ChooseConfiguration();
-
-        if (!int.TryParse(chosenConfigShortcut, out var configNo))
-        {
-            return chosenConfigShortcut;
-        }
-
-        var chosenConfig = ConfigRepo.GetConfigurationByName(
-            ConfigRepo.GetConfigurationNames()[configNo]
-        );
-
-        var gameInstance = new TicTacTwoBrain(chosenConfig);
-
         while (true)
         {
-            Visualizer.DrawBoard(gameInstance);
+            var chosenConfigShortcut = ChooseConfiguration();
 
-            if (gameInstance.IsXTurn)
+            if (!int.TryParse(chosenConfigShortcut, out var configNo))
             {
-                Console.WriteLine("Player X's turn.");
-                HandlePlayerTurn(gameInstance);
-            }
-            else
-            {
-                Console.WriteLine("Player O's turn.");
-                HandlePlayerTurn(gameInstance);
+                return chosenConfigShortcut;
             }
 
-            if (gameInstance.CheckWin())
+            var chosenConfig = ConfigRepo.GetConfigurationByName(
+                ConfigRepo.GetConfigurationNames()[configNo]
+            );
+
+            var gameInstance = new TicTacTwoBrain(chosenConfig);
+
+            while (true)
             {
-                // Console.WriteLine($"Player {gameInstance.GetWinner()} wins!");
                 Visualizer.DrawBoard(gameInstance);
-                break;
+
+                if (gameInstance.IsXTurn)
+                {
+                    Console.WriteLine("Player X's turn.");
+                    var result = HandlePlayerTurn(gameInstance);
+                    if (result == "RETURN") break;
+                    if (result == "CONTINUE") gameInstance.IsXTurn = false;
+                }
+                else
+                {
+                    Console.WriteLine("Player O's turn.");
+                    var result = HandlePlayerTurn(gameInstance);
+                    if (result == "RETURN") break;
+                    if (result == "CONTINUE") gameInstance.IsXTurn = true;
+                }
+
+                if (gameInstance.CheckWin())
+                {
+                    Visualizer.DrawBoard(gameInstance);
+                    break;
+                }
             }
         }
 
         return "Game over";
     }
 
-    private static bool HandlePlayerTurn(TicTacTwoBrain gameInstance)
+    private static string HandlePlayerTurn(TicTacTwoBrain gameInstance)
     {
-        Console.WriteLine("Choose action: (1) Place piece, (2) Move grid, (3) Move piece, (S) Save game, (E) Exit game");
+        if ((gameInstance.IsXTurn && gameInstance.XMoveCount >= 2) ||
+            (!gameInstance.IsXTurn && gameInstance.OMoveCount >= 2))
+        {
+            Console.WriteLine("Choose action: (1) Place piece, (2) Move grid, (3) Move piece, (S) Save game, (R) Return, (E) Exit game");
+        }
+        else if (gameInstance.XMoveCount < 1)
+        {
+            Console.WriteLine("Choose action: (1) Place piece, (S) Save game, (R) Return, (E) Exit game");
+        }
+        else
+        {
+            Console.WriteLine("Choose action: (1) Place piece, (S) Save game, (E) Exit game");
+        }
+
         string? action = Console.ReadLine();
 
         switch (action?.ToUpper())
         {
             case "1":
-                return HandlePlacePiece(gameInstance);
+                return HandlePlacePiece(gameInstance) ? "CONTINUE" : "INVALID";
             case "2":
-                return HandleMoveGrid(gameInstance);
+                return HandleMoveGrid(gameInstance) ? "CONTINUE" : "INVALID";
             case "3":
-                return HandleMovePiece(gameInstance);
+                return HandleMovePiece(gameInstance) ? "CONTINUE" : "INVALID";
             case "S":
                 HandleSaveGame(gameInstance);
-                return true; 
+                return "CONTINUE"; // Save game is always successful
+            case "R":
+                return "RETURN"; // Return to main menu
             case "E":
                 Environment.Exit(0);
-                return true; 
+                return "EXIT"; // Exit game
             default:
                 Console.WriteLine("Invalid choice. Try again.");
-                return false;
+                return "INVALID";
         }
     }
     
     private static bool HandlePlacePiece(TicTacTwoBrain gameInstance)
 {
-    Console.WriteLine("Enter row and column to place piece (e.g., 2 2):");
-    var input = Console.ReadLine()?.Split();
+    Console.WriteLine("Enter row and column to place piece (e.g., 2,2):");
+    var input = Console.ReadLine()?.Split(",");
     if (input?.Length == 2 &&
         int.TryParse(input[0], out int row) &&
         int.TryParse(input[1], out int col))
@@ -147,8 +179,8 @@ public static class GameController
 
 private static bool HandleMoveGrid(TicTacTwoBrain gameInstance)
 {
-    Console.WriteLine("Enter grid move offset (e.g., -1 0 for up):");
-    var input = Console.ReadLine()?.Split();
+    Console.WriteLine("Enter grid move offset (e.g., -1,0 for up):");
+    var input = Console.ReadLine()?.Split(",");
     if (input?.Length == 2 &&
         int.TryParse(input[0], out int rowOffset) &&
         int.TryParse(input[1], out int colOffset))
@@ -172,8 +204,8 @@ private static bool HandleMoveGrid(TicTacTwoBrain gameInstance)
 
 private static bool HandleMovePiece(TicTacTwoBrain gameInstance)
 {
-    Console.WriteLine("Enter source row/col and destination row/col (e.g., 1 1 2 2):");
-    var input = Console.ReadLine()?.Split();
+    Console.WriteLine("Enter source row/col and destination row/col (e.g., 1,1,2,2):");
+    var input = Console.ReadLine()?.Split(",");
     if (input?.Length == 4 &&
         int.TryParse(input[0], out int fromRow) &&
         int.TryParse(input[1], out int fromCol) &&
