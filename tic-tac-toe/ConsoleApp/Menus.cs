@@ -1,12 +1,12 @@
 using MenuSystem;
-using GameBrain;
 using DAL;
 
 namespace ConsoleApp
 {
     public static class Menus
     {
-        private static readonly ConfigRepository ConfigRepo = new ConfigRepository();
+        private static readonly ConfigRepositoryHardcoded ConfigRepo = new ConfigRepositoryHardcoded();
+        private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson();
 
         public static readonly Menu GameConfigMenu = new Menu(
             EMenuLevel.Deep,
@@ -34,7 +34,8 @@ namespace ConsoleApp
                         return GameController.StartGame();
                     }
                 }
-            });
+            }
+        );
 
         public static readonly Menu GameTypeMenu = new Menu(
             EMenuLevel.Secondary,
@@ -70,7 +71,21 @@ namespace ConsoleApp
                         return GameConfigMenu.Run();
                     }
                 }
-            });
+            }
+        );
+        
+        public static readonly Menu SavedGamesMenu = new Menu(
+            EMenuLevel.Secondary,
+            "Choose Saved Game", new List<MenuItem>
+            {
+                new MenuItem
+                {
+                    Shortcut = "X",
+                    Title = "Return",
+                    MenuItemAction = () => "RETURN"
+                }
+            }
+        );
 
         public static readonly Menu MainMenu = new Menu(
             EMenuLevel.Main,
@@ -81,20 +96,37 @@ namespace ConsoleApp
                     Shortcut = "N",
                     Title = "New Game",
                     MenuItemAction = GameTypeMenu.Run
-                },
-                new MenuItem
+                }
+            }
+        );
+
+        static Menus()
+        {
+            var savedGames = GameRepo.GetSavedGames();
+            
+            if (savedGames.Any())
+            {
+                MainMenu.MenuItems.Insert(1, new MenuItem
                 {
                     Shortcut = "S",
                     Title = "Saved Game",
-                    MenuItemAction = DummyMethod // TODO Replace with actual saved game loading method
-                }
-            });
-
-        private static string DummyMethod()
-        {
-            Console.Write("Just press any key to get out from here! (Any key - as a random choice from keyboard....)");
-            Console.ReadKey();
-            return "foobar";
+                    MenuItemAction = () =>
+                    {
+                        SavedGamesMenu.MenuItems.Clear();
+                        foreach (var savedGame in savedGames)
+                        {
+                            var gameFileName = savedGame;
+                            SavedGamesMenu.MenuItems.Add(new MenuItem
+                            {
+                                Shortcut = savedGames.IndexOf(savedGame).ToString(),
+                                Title = savedGame,
+                                MenuItemAction = () => GameController.LoadGame(gameFileName)
+                            });
+                        }
+                        return SavedGamesMenu.Run();
+                    }
+                });
+            }
         }
     }
 }

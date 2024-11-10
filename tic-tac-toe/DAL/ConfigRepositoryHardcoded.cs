@@ -2,7 +2,7 @@ using GameBrain;
 
 namespace DAL;
 
-public class ConfigRepository
+public class ConfigRepositoryHardcoded : IConfigRepository
 {
     private List<GameConfiguration> _gameConfigurations = new List<GameConfiguration>()
     {
@@ -41,6 +41,10 @@ public class ConfigRepository
     public GameConfiguration GetConfigurationByName(string name)
     {
         return _gameConfigurations.Single(c => c.Name == name);
+    }
+    
+    public void SaveConfiguration(GameConfiguration gameConfig)
+    {
     }
     
 }

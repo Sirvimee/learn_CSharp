@@ -23,7 +23,7 @@ public static class Visualizer
                     Console.ResetColor();
                 }
 
-                Console.Write(" " + DrawGamePiece(gameInstance.GameBoard[x, y]) + " ");
+                Console.Write(" " + DrawGamePiece(gameInstance.GameBoard[y][x]) + " ");
                 if (x == gameInstance.DimX - 1) continue;
                 Console.Write("|");
             }
