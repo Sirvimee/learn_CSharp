@@ -12,7 +12,7 @@ namespace DAL
 
             var fileName = directoryPath +
                            gameConfigName + " " +
-                           DateTime.Now.ToString("yyyyMMdd_HHmmss") +
+                           DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss") +
                            FileHelper.GameExtension;
 
             File.WriteAllText(fileName, jsonStateString);

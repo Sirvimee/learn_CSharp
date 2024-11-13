@@ -6,7 +6,8 @@ namespace ConsoleApp
     public static class Menus
     {
         private static readonly ConfigRepositoryHardcoded ConfigRepo = new ConfigRepositoryHardcoded();
-        private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson();
+        // private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson(); // For json
+        private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb(); // For database
 
         public static readonly Menu GameConfigMenu = new Menu(
             EMenuLevel.Deep,
@@ -73,10 +74,11 @@ namespace ConsoleApp
                 }
             }
         );
-        
+
         public static readonly Menu SavedGamesMenu = new Menu(
             EMenuLevel.Secondary,
-            "Choose Saved Game", new List<MenuItem>
+            "Choose Saved Game", 
+            new List<MenuItem>
             {
                 new MenuItem
                 {
@@ -99,34 +101,44 @@ namespace ConsoleApp
                 }
             }
         );
-
-        static Menus()
+        
+        public static void LoadSavedGamesMenu()
         {
             var savedGames = GameRepo.GetSavedGames();
             
+            SavedGamesMenu.MenuItems.Clear();
+            
             if (savedGames.Any())
             {
+                int counter = 1; 
+
+                foreach (var gameName in savedGames)
+                {
+                    SavedGamesMenu.MenuItems.Add(new MenuItem
+                    {
+                        Shortcut = counter.ToString(), 
+                        Title = $"{gameName}", 
+                        MenuItemAction = () => GameController.LoadGame(gameName) 
+                    });
+                    counter++; 
+                }
+                
                 MainMenu.MenuItems.Insert(1, new MenuItem
                 {
                     Shortcut = "S",
-                    Title = "Saved Game",
-                    MenuItemAction = () =>
-                    {
-                        SavedGamesMenu.MenuItems.Clear();
-                        foreach (var savedGame in savedGames)
-                        {
-                            var gameFileName = savedGame;
-                            SavedGamesMenu.MenuItems.Add(new MenuItem
-                            {
-                                Shortcut = savedGames.IndexOf(savedGame).ToString(),
-                                Title = savedGame,
-                                MenuItemAction = () => GameController.LoadGame(gameFileName)
-                            });
-                        }
-                        return SavedGamesMenu.Run();
-                    }
+                    Title = "Saved Games", 
+                    MenuItemAction = SavedGamesMenu.Run 
                 });
             }
+            else
+            {
+                MainMenu.MenuItems.RemoveAll(item => item.Shortcut == "S");
+            }
+        }
+        
+        static Menus()
+        {
+            LoadSavedGamesMenu(); 
         }
     }
 }

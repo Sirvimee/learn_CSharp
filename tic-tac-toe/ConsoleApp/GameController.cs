@@ -1,14 +1,17 @@
 using ConsoleUI;
 using DAL;
+using Domain;
 using GameBrain;
 using MenuSystem;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleApp;
 
 public static class GameController
 {
     private static readonly IConfigRepository ConfigRepo = new ConfigRepositoryHardcoded();
-    private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson();
+    // private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson(); // For json
+    private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb(); // For database
 
     public static string SelectedGameType { get; private set; } = null!;
     public static GameConfiguration SelectedGameConfiguration { get; private set; } = default!;
@@ -238,14 +241,23 @@ public static class GameController
     private static void HandleSaveGame(TicTacTwoBrain gameInstance)
     {
         var gameState = gameInstance.GetGameStateAsJson();
+        
         GameRepo.SaveGame(gameState, SelectedGameConfiguration.Name);
+    
         Console.WriteLine("Game saved successfully.");
     }
-
-    public static string LoadGame(string gameFileName)
+    
+    public static List<string> GetSavedGames()
     {
-        var gameStateJson = GameRepo.LoadGame(gameFileName);
-        var gameInstance = TicTacTwoBrain.FromJson(gameStateJson);
+        var savedGames = GameRepo.GetSavedGames();
+
+        return savedGames.Concat(savedGames).Distinct().ToList();
+    }
+
+    public static string LoadGame(string gameName)
+    {
+        var loadGame = GameRepo.LoadGame(gameName);
+        var gameInstance = TicTacTwoBrain.FromJson(loadGame);
         SelectedGameConfiguration = gameInstance.Configuration;
 
         while (true)
