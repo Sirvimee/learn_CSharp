@@ -2,7 +2,7 @@ namespace DAL
 {
     public class GameRepositoryJson : IGameRepository
     {
-        public void SaveGame(string jsonStateString, string gameConfigName)
+        public void SaveGame(string jsonStateString, string gameConfigName, string gameType)
         {
             var directoryPath = FileHelper.BasePath;
             if (!Directory.Exists(directoryPath))
@@ -11,8 +11,9 @@ namespace DAL
             }
 
             var fileName = directoryPath +
+                           gameType + " " + 
                            gameConfigName + " " +
-                           DateTime.Now.ToString("yyyyMMdd_HHmmss") +
+                           DateTime.Now.ToString("dd/MM/yyy_HH-mm-ss") +
                            FileHelper.GameExtension;
 
             File.WriteAllText(fileName, jsonStateString);

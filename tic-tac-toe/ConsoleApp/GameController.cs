@@ -8,14 +8,19 @@ namespace ConsoleApp;
 public static class GameController
 {
     private static readonly IConfigRepository ConfigRepo = new ConfigRepositoryHardcoded();
-    private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson();
+    private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson(); // For json
+    // private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb(); // For database
 
     public static string SelectedGameType { get; private set; } = null!;
     public static GameConfiguration SelectedGameConfiguration { get; private set; } = default!;
+    public static bool IsVersusAi { get; private set; } = false;
+    public static bool AiVersusAi { get; private set; } = false;
 
     public static void SetSelectedGameType(string gameType)
     {
         SelectedGameType = gameType;
+        IsVersusAi = gameType == "Player vs AI"; 
+        AiVersusAi = gameType == "AI vs AI";
     }
 
     public static void SetSelectedGameConfiguration(GameConfiguration config)
@@ -27,81 +32,115 @@ public static class GameController
     {
         var game = new TicTacTwoBrain(SelectedGameConfiguration);
 
-        while (true)
+        if (AiVersusAi)
         {
-            Visualizer.DrawBoard(game);
-
-            if (game.IsXTurn)
-            {
-                Console.WriteLine("Player X's turn.");
-                var result = HandlePlayerTurn(game);
-                if (result == "RETURN") return "Returned to main menu";
-                if (result == "CONTINUE") game.IsXTurn = false;
-            }
-            else
-            {
-                Console.WriteLine("Player O's turn.");
-                var result = HandlePlayerTurn(game);
-                if (result == "RETURN") return "Returned to main menu";
-                if (result == "CONTINUE") game.IsXTurn = true;
-            }
-
-            // Check for draw condition
-            if (game.XMoveCount + game.OMoveCount == game.DimX * game.DimY)
-            {
-                Visualizer.DrawBoard(game);
-                Console.WriteLine("The game is a draw!");
-                break;
-            }
+            Console.WriteLine("Starting AI vs AI...");
+            return RunGameLoop(game, 'X', 'O'); 
         }
-
-        return "Game over";
-    }
-
-    public static string MainLoop()
-    {
-        while (true)
+        else if (IsVersusAi)
         {
-            var chosenConfigShortcut = ChooseConfiguration();
+            Console.WriteLine("Starting Player vs AI...");
+            return RunGameLoop(game, 'X', 'O');  
+        }
+        else
+        {
+            Console.WriteLine("Starting Player vs Player...");
+            return RunGameLoop(game, 'X', 'O');  
+        }
+    }
+    
+    public static string LoadGame(string gameName)
+    {
+        var loadGame = GameRepo.LoadGame(gameName);
+        var gameInstance = TicTacTwoBrain.FromJson(loadGame);
+        SelectedGameConfiguration = gameInstance.Configuration;
+        return RunGameLoop(gameInstance, 'X', 'O');
+    }
+    
+    private static string RunGameLoop(TicTacTwoBrain gameInstance, char playerX, char playerO)
+{
+    while (true)
+    {
+        Visualizer.DrawBoard(gameInstance);
 
-            if (!int.TryParse(chosenConfigShortcut, out var configNo))
+        if (gameInstance.IsXTurn)
+        {
+            if (AiVersusAi) // AI X turn
             {
-                return chosenConfigShortcut;
-            }
-
-            var chosenConfig = ConfigRepo.GetConfigurationByName(
-                ConfigRepo.GetConfigurationNames()[configNo]
-            );
-
-            var gameInstance = new TicTacTwoBrain(chosenConfig);
-
-            while (true)
-            {
-                Visualizer.DrawBoard(gameInstance);
-
-                if (gameInstance.IsXTurn)
-                {
-                    Console.WriteLine("Player X's turn.");
-                    var result = HandlePlayerTurn(gameInstance);
-                    if (result == "RETURN") break;
-                    if (result == "CONTINUE") gameInstance.IsXTurn = false;
-                }
-                else
-                {
-                    Console.WriteLine("Player O's turn.");
-                    var result = HandlePlayerTurn(gameInstance);
-                    if (result == "RETURN") break;
-                    if (result == "CONTINUE") gameInstance.IsXTurn = true;
-                }
-
-                if (gameInstance.CheckWin())
+                Console.WriteLine("AI X's turn.");
+                MakeAiMove(gameInstance, playerX); 
+                if (gameInstance.CheckWin(playerX))
                 {
                     Visualizer.DrawBoard(gameInstance);
-                    break;
+                    Console.WriteLine("AI X wins!");
+                    return "Game over";
                 }
+                gameInstance.IsXTurn = false;
+            }
+            else if (IsVersusAi) // Player X vs AI O
+            {
+                Console.WriteLine("Player X's turn.");
+                var result = HandlePlayerTurn(gameInstance);
+                if (result == "RETURN") return "Return"; 
+                if (result == "CONTINUE") gameInstance.IsXTurn = false;
+                if (result == "MENU") return Menus.MainMenu.Run();
+            }
+            else // Player X vs Player O
+            {
+                Console.WriteLine("Player X's turn.");
+                var result = HandlePlayerTurn(gameInstance);
+                if (result == "RETURN") return "Return"; 
+                if (result == "CONTINUE") gameInstance.IsXTurn = false;
+                if (result == "MENU") return Menus.MainMenu.Run();
             }
         }
+        else // Player O or AI O's turn
+        {
+            if (AiVersusAi) // AI O turn
+            {
+                Console.WriteLine("AI O's turn.");
+                MakeAiMove(gameInstance, playerO);  
+                if (gameInstance.CheckWin(playerO))
+                {
+                    Visualizer.DrawBoard(gameInstance);
+                    Console.WriteLine("AI O wins!");
+                    return "Game over";
+                }
+                gameInstance.IsXTurn = true;
+            }
+            else if (IsVersusAi) // Player O vs AI X
+            {
+                Console.WriteLine("AI O's turn.");
+                MakeAiMove(gameInstance, playerO);  
+                if (gameInstance.CheckWin(playerO))
+                {
+                    Visualizer.DrawBoard(gameInstance);
+                    Console.WriteLine("AI O wins!");
+                    return "Game over";
+                }
+                gameInstance.IsXTurn = true;
+            }
+            else // Player O vs Player X
+            {
+                Console.WriteLine("Player O's turn.");
+                var result = HandlePlayerTurn(gameInstance);
+                if (result == "RETURN") return "Return"; 
+                if (result == "CONTINUE") gameInstance.IsXTurn = true;
+                if (result == "MENU") return Menus.MainMenu.Run();
+            }
+        }
+
+        // Check for draw (all cells filled, no winner)
+        if (gameInstance.XMoveCount + gameInstance.OMoveCount == gameInstance.DimX * gameInstance.DimY)
+        {
+            Visualizer.DrawBoard(gameInstance);
+            Console.WriteLine("The game is a draw!");
+            break;
+        }
     }
+
+    return "Game over";
+}
 
     private static string HandlePlayerTurn(TicTacTwoBrain gameInstance)
     {
@@ -130,54 +169,18 @@ public static class GameController
             case "3":
                 return HandleMovePiece(gameInstance) ? "CONTINUE" : "INVALID";
             case "S":
-                HandleSaveGame(gameInstance);
-                return "CONTINUE"; 
+                return HandleSaveGame(gameInstance);
             case "R":
                 return "RETURN"; 
             case "E":
                 Environment.Exit(0);
-                return "EXIT"; 
+                return "EXIT";
             default:
                 Console.WriteLine("Invalid choice. Try again.");
                 return "INVALID";
         }
     }
     
-    private static bool HandlePlacePiece(TicTacTwoBrain gameInstance)
-    {
-        Console.WriteLine("Enter row and column to place piece (e.g., 1,1):");
-        var input = Console.ReadLine()?.Split(",");
-        if (input?.Length == 2 &&
-            int.TryParse(input[0], out int row) &&
-            int.TryParse(input[1], out int col))
-        {
-            row -= 1;
-            col -= 1;
-            
-            if (gameInstance.MakeAMove(row, col))
-            {
-                if (gameInstance.CheckWin())
-                {
-                    Visualizer.DrawBoard(gameInstance);
-                    Console.WriteLine($"Player {(gameInstance.IsXTurn ? "X" : "O")} wins!");
-                    Environment.Exit(0); 
-                }
-
-                return true;
-            }
-            else
-            {
-                Console.WriteLine("Invalid move, try again.");
-                return false;
-            }
-        }
-        else
-        {
-            Console.WriteLine("Invalid input.");
-            return false;
-        }
-    }
-
     private static bool HandleMoveGrid(TicTacTwoBrain gameInstance)
     {
         Console.WriteLine("Enter grid move offset (e.g., -1,0 for up):");
@@ -234,72 +237,124 @@ public static class GameController
             return false;
         }
     }
-    
-    private static void HandleSaveGame(TicTacTwoBrain gameInstance)
+
+    private static string HandleSaveGame(TicTacTwoBrain gameInstance)
     {
-        var gameState = gameInstance.GetGameStateAsJson();
-        GameRepo.SaveGame(gameState, SelectedGameConfiguration.Name);
+        var gameState = gameInstance.GetGameStateAsJson(); 
+        var gameType = SelectedGameType;
+        GameRepo.SaveGame(gameState, gameType, SelectedGameConfiguration.Name); 
+
         Console.WriteLine("Game saved successfully.");
-    }
-
-    public static string LoadGame(string gameFileName)
-    {
-        var gameStateJson = GameRepo.LoadGame(gameFileName);
-        var gameInstance = TicTacTwoBrain.FromJson(gameStateJson);
-        SelectedGameConfiguration = gameInstance.Configuration;
-
+        Console.WriteLine("Do you want play again? (Y = yes, N = no)");
+        
         while (true)
         {
-            Visualizer.DrawBoard(gameInstance);
-
-            if (gameInstance.IsXTurn)
+            var input = Console.ReadLine()?.ToUpper();
+            if (input == "Y")
             {
-                Console.WriteLine("Player X's turn.");
-                var result = HandlePlayerTurn(gameInstance);
-                if (result == "RETURN") return "Returned to main menu";
-                if (result == "CONTINUE") gameInstance.IsXTurn = false;
+                return "MENU"; 
+            }
+            else if (input == "N")
+            {
+                Environment.Exit(0); 
+                return "EXIT"; 
             }
             else
             {
-                Console.WriteLine("Player O's turn.");
-                var result = HandlePlayerTurn(gameInstance);
-                if (result == "RETURN") return "Returned to main menu";
-                if (result == "CONTINUE") gameInstance.IsXTurn = true;
-            }
-
-            if (gameInstance.CheckWin())
-            {
-                Visualizer.DrawBoard(gameInstance);
-                Console.WriteLine($"Player {(gameInstance.IsXTurn ? "X" : "O")} wins!");
-                break;
+                Console.WriteLine("Please enter 'Y' (yes) or 'N' (no).");
             }
         }
-
-        return "Game over";
     }
 
-    private static string ChooseConfiguration()
+    private static void MakeAiMove(TicTacTwoBrain gameInstance, char aiPlayer)
+{
+    // Check if AI can win
+    for (var row = 0; row < gameInstance.DimY; row++)
     {
-        var configMenuItems = new List<MenuItem>();
-
-        for (var i = 0; i < ConfigRepo.GetConfigurationNames().Count; i++)
+        for (var col = 0; col < gameInstance.DimX; col++)
         {
-            var returnValue = i.ToString();
-            configMenuItems.Add(new MenuItem()
+            if (gameInstance.GameBoard[row][col] == '.')
             {
-                Title = ConfigRepo.GetConfigurationNames()[i],
-                Shortcut = (i + 1).ToString(),
-                MenuItemAction = () => returnValue
-            });
+                gameInstance.GameBoard[row][col] = aiPlayer; 
+                if (gameInstance.CheckWin(aiPlayer))
+                {
+                    Console.WriteLine($"AI ({aiPlayer}) wins by moving to ({row + 1}, {col + 1})");
+                    return;
+                }
+                gameInstance.GameBoard[row][col] = '.'; 
+            }
         }
+    }
 
-        var configMenu = new Menu(EMenuLevel.Deep,
-            "TIC-TAC-TWO - choose game config",
-            configMenuItems,
-            isCustomMenu: true
-        );
+    // Check if Player X (opponent) can win, then block
+    char opponent = aiPlayer == 'X' ? 'O' : 'X'; 
+    for (var row = 0; row < gameInstance.DimY; row++)
+    {
+        for (var col = 0; col < gameInstance.DimX; col++)
+        {
+            if (gameInstance.GameBoard[row][col] == '.')
+            {
+                gameInstance.GameBoard[row][col] = opponent; 
+                if (gameInstance.CheckWin(opponent))
+                {
+                    gameInstance.GameBoard[row][col] = aiPlayer; 
+                    Console.WriteLine($"AI ({aiPlayer}) blocks {opponent} at ({row + 1}, {col + 1})");
+                    return;
+                }
+                gameInstance.GameBoard[row][col] = '.'; 
+            }
+        }
+    }
 
-        return configMenu.Run();
+    // If AI can't win or block, make a simple move
+    for (var row = 0; row < gameInstance.DimY; row++)
+    {
+        for (var col = 0; col < gameInstance.DimX; col++)
+        {
+            if (gameInstance.GameBoard[row][col] == '.')
+            {
+                gameInstance.GameBoard[row][col] = aiPlayer; 
+                Console.WriteLine($"AI ({aiPlayer}) moves to ({row + 1}, {col + 1})");
+                return;
+            }
+        }
+    }
+}
+
+    private static bool HandlePlacePiece(TicTacTwoBrain gameInstance)
+    {
+        Console.WriteLine("Enter row and column to place piece (e.g., 1,1):");
+        var input = Console.ReadLine()?.Split(",");
+        char currentPlayerPiece = gameInstance.IsXTurn ? 'X' : 'O';
+        if (input?.Length == 2 &&
+            int.TryParse(input[0], out int row) &&
+            int.TryParse(input[1], out int col))
+        {
+            row -= 1;
+            col -= 1;
+
+            if (gameInstance.MakeAMove(row, col))
+            {
+                if (gameInstance.CheckWin(currentPlayerPiece))
+                {
+                    Visualizer.DrawBoard(gameInstance);
+                    Console.WriteLine($"Player {(gameInstance.IsXTurn ? "X" : "O")} wins!");
+                    Environment.Exit(0); 
+                }
+
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("Invalid move, try again.");
+                return false;
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid input.");
+            return false;
+        }
     }
 }
 

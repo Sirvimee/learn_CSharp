@@ -107,90 +107,53 @@ namespace GameBrain
             return false;
         }
 
-        public bool CheckWin()
+        public bool CheckWin(char playerPiece)
         {
             int winCondition = Configuration.WinCondition;
-            char currentPlayerPiece = IsXTurn ? 'X' : 'O';
 
+            // Horizontal check
             for (int row = SmallBoardPosY; row < SmallBoardPosY + SmallBoardHeight; row++)
             {
                 for (int col = SmallBoardPosX; col <= SmallBoardPosX + SmallBoardWidth - winCondition; col++)
                 {
-                    bool win = true;
-                    for (int k = 0; k < winCondition; k++)
+                    if (Enumerable.Range(0, winCondition).All(k => GameBoard[row][col + k] == playerPiece))
                     {
-                        if (GameBoard[row][col + k] != currentPlayerPiece)
-                        {
-                            win = false;
-                            break;
-                        }
-                    }
-                    if (win)
-                    {
-                        Console.WriteLine("Horizontal win detected.");
                         return true;
                     }
                 }
             }
 
+            // Vertical check
             for (int col = SmallBoardPosX; col < SmallBoardPosX + SmallBoardWidth; col++)
             {
                 for (int row = SmallBoardPosY; row <= SmallBoardPosY + SmallBoardHeight - winCondition; row++)
                 {
-                    bool win = true;
-                    for (int k = 0; k < winCondition; k++)
+                    if (Enumerable.Range(0, winCondition).All(k => GameBoard[row + k][col] == playerPiece))
                     {
-                        if (GameBoard[row + k][col] != currentPlayerPiece)
-                        {
-                            win = false;
-                            break;
-                        }
-                    }
-                    if (win)
-                    {
-                        Console.WriteLine("Vertical win detected.");
                         return true;
                     }
                 }
             }
 
+            // Diagonal (top-left to bottom-right)
             for (int row = SmallBoardPosY; row <= SmallBoardPosY + SmallBoardHeight - winCondition; row++)
             {
                 for (int col = SmallBoardPosX; col <= SmallBoardPosX + SmallBoardWidth - winCondition; col++)
                 {
-                    bool win = true;
-                    for (int k = 0; k < winCondition; k++)
+                    if (Enumerable.Range(0, winCondition).All(k => GameBoard[row + k][col + k] == playerPiece))
                     {
-                        if (GameBoard[row + k][col + k] != currentPlayerPiece)
-                        {
-                            win = false;
-                            break;
-                        }
-                    }
-                    if (win)
-                    {
-                        Console.WriteLine("Diagonal win (top-left to bottom-right) detected.");
                         return true;
                     }
                 }
             }
 
+            // Diagonal (bottom-left to top-right)
             for (int row = SmallBoardPosY + winCondition - 1; row < SmallBoardPosY + SmallBoardHeight; row++)
             {
                 for (int col = SmallBoardPosX; col <= SmallBoardPosX + SmallBoardWidth - winCondition; col++)
                 {
-                    bool win = true;
-                    for (int k = 0; k < winCondition; k++)
+                    if (Enumerable.Range(0, winCondition).All(k => GameBoard[row - k][col + k] == playerPiece))
                     {
-                        if (GameBoard[row - k][col + k] != currentPlayerPiece)
-                        {
-                            win = false;
-                            break;
-                        }
-                    }
-                    if (win)
-                    {
-                        Console.WriteLine("Diagonal win (bottom-left to top-right) detected.");
                         return true;
                     }
                 }
@@ -198,6 +161,7 @@ namespace GameBrain
 
             return false;
         }
+
 
         public bool MovePiece(int fromRow, int fromCol, int toRow, int toCol)
         {
