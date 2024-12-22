@@ -6,14 +6,17 @@ public static class Visualizer
 {
     public static void DrawBoard(TicTacTwoBrain gameInstance)
     {
-        var config = gameInstance.Configuration;
+        int smallBoardStartX = Math.Max(gameInstance.SmallBoardPosX, 0);
+        int smallBoardStartY = Math.Max(gameInstance.SmallBoardPosY, 0);
+        int smallBoardEndX = Math.Min(gameInstance.SmallBoardPosX + gameInstance.SmallBoardWidth, gameInstance.DimX);
+        int smallBoardEndY = Math.Min(gameInstance.SmallBoardPosY + gameInstance.SmallBoardHeight, gameInstance.DimY);
 
         for (var y = 0; y < gameInstance.DimY; y++)
         {
             for (var x = 0; x < gameInstance.DimX; x++)
             {
-                if (x >= gameInstance.SmallBoardPosX && x < gameInstance.SmallBoardPosX + gameInstance.SmallBoardWidth &&
-                    y >= gameInstance.SmallBoardPosY && y < gameInstance.SmallBoardPosY + gameInstance.SmallBoardHeight)
+                if (x >= smallBoardStartX && x < smallBoardEndX &&
+                    y >= smallBoardStartY && y < smallBoardEndY)
                 {
                     Console.BackgroundColor = ConsoleColor.Cyan;
                     Console.ForegroundColor = ConsoleColor.Black;
@@ -22,24 +25,31 @@ public static class Visualizer
                 {
                     Console.ResetColor();
                 }
-
+                
                 Console.Write(" " + DrawGamePiece(gameInstance.GameBoard[y][x]) + " ");
-                if (x == gameInstance.DimX - 1) continue;
-                Console.Write("|");
-            }
-
-            Console.WriteLine();
-            if (y == gameInstance.DimY - 1) continue;
-
-            for (var x = 0; x < gameInstance.DimX; x++)
-            {
-                Console.Write("---");
-                if (x != gameInstance.DimX - 1)
+                
+                Console.ResetColor();
+                if (x < gameInstance.DimX - 1)
                 {
-                    Console.Write("+");
+                    Console.Write("|");
                 }
             }
+
             Console.WriteLine();
+            
+            if (y < gameInstance.DimY - 1)
+            {
+                Console.ResetColor();
+                for (var x = 0; x < gameInstance.DimX; x++)
+                {
+                    Console.Write("---");
+                    if (x < gameInstance.DimX - 1)
+                    {
+                        Console.Write("+");
+                    }
+                }
+                Console.WriteLine();
+            }
         }
 
         Console.ResetColor();

@@ -20,18 +20,19 @@ namespace DAL
             File.WriteAllText(fileName, jsonStateString);
         }
 
-        public List<string> GetSavedGames()
+        public List<string?> GetSavedGames(string playerName)
         {
             var directoryPath = FileHelper.BasePath;
             if (!Directory.Exists(directoryPath) || Directory.GetFiles(directoryPath).Length == 0)
             {
-                return new List<string>();
+                return new List<string?>();
             }
-
+            
             return Directory
                 .GetFiles(directoryPath, "*" + FileHelper.GameExtension)
                 .Select(Path.GetFileNameWithoutExtension)
-                .ToList()!;
+                .Where(fileName => fileName?.StartsWith(playerName + " ") ?? false) 
+                .ToList();
         }
 
         public string LoadGame(string gameFileName)

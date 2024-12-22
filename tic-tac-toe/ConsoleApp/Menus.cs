@@ -104,7 +104,7 @@ namespace ConsoleApp
         
         public static void LoadSavedGamesMenu()
         {
-            var savedGames = GameRepo.GetSavedGames();
+            var savedGames = GameRepo.GetSavedGames(GameController.PlayerName);
             var returnMenuItem = SavedGamesMenu.MenuItems
                 .FirstOrDefault(item => item.Shortcut == "R");
             

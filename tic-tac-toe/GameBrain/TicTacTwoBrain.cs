@@ -68,6 +68,64 @@ namespace GameBrain
             }
             return result;
         }
+        
+        public bool MakeAiMove()
+        {
+            var aiPlayer = IsXTurn ? 'X' : 'O';
+            // Check if AI can win
+            for (var row = 0; row < DimY; row++)
+            {
+                for (var col = 0; col < DimX; col++)
+                {
+                    if (GameBoard[row][col] == '.')
+                    {
+                        GameBoard[row][col] = aiPlayer;
+                        
+                        if (CheckWin(aiPlayer))
+                        {
+                            return true;
+                        }
+                        GameBoard[row][col] = '.'; 
+                    }
+                }
+            }
+
+            // Check if Player X (opponent) can win, then block
+            char opponent = aiPlayer == 'X' ? 'O' : 'X'; 
+            for (var row = 0; row < DimY; row++)
+            {
+                for (var col = 0; col < DimX; col++)
+                {
+                    if (GameBoard[row][col] == '.')
+                    {
+                        GameBoard[row][col] = opponent;
+                        if (CheckWin(opponent))
+                        {
+                            GameBoard[row][col] = aiPlayer; 
+                            return true;
+                        }
+                        GameBoard[row][col] = '.'; 
+                    }
+                }
+            }
+
+            // If AI can't win or block, make a simple move
+            for (var row = 0; row < DimY; row++)
+            {
+                for (var col = 0; col < DimX; col++)
+                {
+                    if (GameBoard[row][col] == '.')
+                    {
+                        GameBoard[row][col] = aiPlayer; 
+                        Console.WriteLine($"AI ({aiPlayer}) moves to ({row + 1}, {col + 1})");
+                        if (IsXTurn) XMoveCount++;
+                        else OMoveCount++;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
         public bool MakeAMove(int row, int col)
         {
@@ -89,6 +147,39 @@ namespace GameBrain
                 Console.WriteLine("Invalid move. Try again.");
                 return false;
             }
+        }
+        
+        public bool MovePiece(int fromRow, int fromCol, int toRow, int toCol)
+        {
+            if (fromRow < 0 || fromRow >= DimX || fromCol < 0 || fromCol >= DimY)
+            {
+                Console.WriteLine("Invalid source coordinates. Try again.");
+                return false;
+            }
+
+            if (toRow < 0 || toRow >= DimX || toCol < 0 || toCol >= DimY)
+            {
+                Console.WriteLine("Invalid destination coordinates. Try again.");
+                return false;
+            }
+
+            char currentPlayerPiece = IsXTurn ? 'X' : 'O';
+            if (GameBoard[fromRow][fromCol] != currentPlayerPiece)
+            {
+                Console.WriteLine("You can only move your own piece. Try again.");
+                return false;
+            }
+
+            if (GameBoard[toRow][toCol] != '.')
+            {
+                Console.WriteLine("Destination cell is not empty. Try again.");
+                return false;
+            }
+
+            GameBoard[fromRow][fromCol] = '.';
+            GameBoard[toRow][toCol] = currentPlayerPiece;
+
+            return true;
         }
 
         public bool MoveGrid(int rowOffset, int colOffset)
@@ -159,40 +250,6 @@ namespace GameBrain
             }
 
             return false;
-        }
-
-
-        public bool MovePiece(int fromRow, int fromCol, int toRow, int toCol)
-        {
-            if (fromRow < 0 || fromRow >= DimX || fromCol < 0 || fromCol >= DimY)
-            {
-                Console.WriteLine("Invalid source coordinates. Try again.");
-                return false;
-            }
-
-            if (toRow < 0 || toRow >= DimX || toCol < 0 || toCol >= DimY)
-            {
-                Console.WriteLine("Invalid destination coordinates. Try again.");
-                return false;
-            }
-
-            char currentPlayerPiece = IsXTurn ? 'X' : 'O';
-            if (GameBoard[fromRow][fromCol] != currentPlayerPiece)
-            {
-                Console.WriteLine("You can only move your own piece. Try again.");
-                return false;
-            }
-
-            if (GameBoard[toRow][toCol] != '.')
-            {
-                Console.WriteLine("Destination cell is not empty. Try again.");
-                return false;
-            }
-
-            GameBoard[fromRow][fromCol] = '.';
-            GameBoard[toRow][toCol] = currentPlayerPiece;
-
-            return true;
         }
     }
 }
