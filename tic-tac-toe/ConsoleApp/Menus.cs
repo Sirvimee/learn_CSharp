@@ -110,6 +110,8 @@ namespace ConsoleApp
             
             SavedGamesMenu.MenuItems.Clear();
             
+            SavedGamesMenu.MenuItems.Clear();
+            
             if (savedGames.Any())
             {
                 int counter = 1; 

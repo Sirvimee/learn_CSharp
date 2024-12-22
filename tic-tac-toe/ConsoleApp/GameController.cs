@@ -1,7 +1,9 @@
 using ConsoleUI;
 using DAL;
+using Domain;
 using GameBrain;
 using MenuSystem;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleApp;
 
