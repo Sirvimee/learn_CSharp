@@ -1,5 +1,4 @@
 ﻿using ConsoleApp;
-using GameBrain;
 
 Console.WriteLine("What is your player name? ");
 string? playerName = Console.ReadLine();

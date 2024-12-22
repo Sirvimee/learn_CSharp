@@ -6,12 +6,12 @@ namespace ConsoleApp
     public static class Menus
     {
         private static readonly ConfigRepositoryHardcoded ConfigRepo = new ConfigRepositoryHardcoded();
-        private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson(); // For json
-        // private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb(); // For database
+        // private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson(); // For json
+        private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb(); // For database
 
         public static readonly Menu GameConfigMenu = new Menu(
             EMenuLevel.Deep,
-            "Choose Game Configuration", new List<MenuItem>
+            "Choose Game Config", new List<MenuItem>
             {
                 new MenuItem
                 {

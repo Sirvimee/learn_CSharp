@@ -8,8 +8,8 @@ namespace ConsoleApp;
 public static class GameController
 {
     private static readonly IConfigRepository ConfigRepo = new ConfigRepositoryHardcoded();
-    private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson(); // For json
-    // private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb(); // For database
+    // private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson(); // For json
+    private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb(); // For database
 
     public static string SelectedGameType { get; private set; } = "Default";
     public static string PlayerName { get; set; } = "Default";
