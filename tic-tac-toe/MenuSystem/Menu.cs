@@ -15,7 +15,7 @@ public class Menu
     private MenuItem _menuItemReturn = new MenuItem()
     {
         Shortcut = "R",
-        Title = "Return to the previous menu"
+        Title = "Return"
     };
 
     private EMenuLevel MenuLevel { get; set; }

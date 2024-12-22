@@ -2,34 +2,28 @@ using Domain;
 
 namespace DAL;
 
-public class GameRepositoryDb : IGameRepositoryDb
+public class GameRepositoryDb : IGameRepository
 {
-    public void SaveGame(string gameState, string configName)
+    public void SaveGame(string jsonStateString, string gameConfigName, string gameType, string playerName)
     {
         using var dbContext = new AppDbContextFactory().CreateDbContext(new string[] { });
         
-        var config = dbContext.Configs.FirstOrDefault(c => c.Name == configName);
-        if (config == null)
-        {
-            throw new Exception($"Config with name {configName} not found.");
-        }
-        
         var game = new Game
         {
-            GameName = configName + " " + DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss"),
-            GameState = gameState,
-            ConfigId = config.Id
+            GameName = playerName + " " + gameConfigName + " " + DateTime.Now.ToString("dd.MM.yyyy HH-mm-ss"),
+            GameState = jsonStateString,
         };
         
         dbContext.Games.Add(game);
         dbContext.SaveChanges();
     }
     
-    public List<string> GetSavedGames()
+    public List<string> GetSavedGames(string playerName)
     {
         using var dbContext = new AppDbContextFactory().CreateDbContext(new string[] { });
-        
+
         return dbContext.Games
+            .Where(g => g.GameName.StartsWith(playerName + " ")) 
             .Select(g => g.GameName)
             .Distinct() 
             .ToList();

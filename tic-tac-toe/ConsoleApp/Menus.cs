@@ -11,7 +11,7 @@ namespace ConsoleApp
 
         public static readonly Menu GameConfigMenu = new Menu(
             EMenuLevel.Deep,
-            "Choose Game Configuration", new List<MenuItem>
+            "Choose Game Config", new List<MenuItem>
             {
                 new MenuItem
                 {
@@ -77,14 +77,14 @@ namespace ConsoleApp
 
         public static readonly Menu SavedGamesMenu = new Menu(
             EMenuLevel.Secondary,
-            "Choose Saved Game", 
+            "Choose Saved Game",
             new List<MenuItem>
             {
                 new MenuItem
                 {
-                    Shortcut = "X",
-                    Title = "Return",
-                    MenuItemAction = () => "RETURN"
+                    Shortcut = "T",
+                    Title = "Temporary Placeholder",
+                    MenuItemAction = () => "PLACEHOLDER"
                 }
             }
         );
@@ -104,7 +104,11 @@ namespace ConsoleApp
         
         public static void LoadSavedGamesMenu()
         {
-            var savedGames = GameRepo.GetSavedGames();
+            var savedGames = GameRepo.GetSavedGames(GameController.PlayerName);
+            var returnMenuItem = SavedGamesMenu.MenuItems
+                .FirstOrDefault(item => item.Shortcut == "R");
+            
+            SavedGamesMenu.MenuItems.Clear();
             
             SavedGamesMenu.MenuItems.Clear();
             
@@ -122,7 +126,9 @@ namespace ConsoleApp
                     });
                     counter++; 
                 }
-                
+
+                if (returnMenuItem != null) SavedGamesMenu.MenuItems.Add(returnMenuItem);
+
                 MainMenu.MenuItems.Insert(1, new MenuItem
                 {
                     Shortcut = "S",
