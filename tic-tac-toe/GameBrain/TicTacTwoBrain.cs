@@ -16,7 +16,6 @@ namespace GameBrain
 
         public int XMoveCount { get; set; }
         public int OMoveCount { get; set; }
-
         public GameConfiguration Configuration { get; set; }
 
         public TicTacTwoBrain()

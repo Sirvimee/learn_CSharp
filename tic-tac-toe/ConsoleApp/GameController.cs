@@ -11,7 +11,8 @@ public static class GameController
     private static readonly GameRepositoryJson GameRepo = new GameRepositoryJson(); // For json
     // private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb(); // For database
 
-    public static string SelectedGameType { get; private set; } = null!;
+    public static string SelectedGameType { get; private set; } = "Default";
+    public static string PlayerName { get; set; } = "Default";
     public static GameConfiguration SelectedGameConfiguration { get; private set; } = default!;
     public static bool IsVersusAi { get; private set; } = false;
     public static bool AiVersusAi { get; private set; } = false;
@@ -25,9 +26,11 @@ public static class GameController
 
     public static void SetSelectedGameConfiguration(GameConfiguration config)
     {
+        config.PlayerName = PlayerName;
+        config.GameType = SelectedGameType;
         SelectedGameConfiguration = config;
     }
-
+    
     public static string StartGame()
     {
         var game = new TicTacTwoBrain(SelectedGameConfiguration);
@@ -58,89 +61,90 @@ public static class GameController
     }
     
     private static string RunGameLoop(TicTacTwoBrain gameInstance, char playerX, char playerO)
-{
-    while (true)
     {
-        Visualizer.DrawBoard(gameInstance);
-
-        if (gameInstance.IsXTurn)
+        while (true)
         {
-            if (AiVersusAi) // AI X turn
-            {
-                Console.WriteLine("AI X's turn.");
-                MakeAiMove(gameInstance, playerX); 
-                if (gameInstance.CheckWin(playerX))
-                {
-                    Visualizer.DrawBoard(gameInstance);
-                    Console.WriteLine("AI X wins!");
-                    return "Game over";
-                }
-                gameInstance.IsXTurn = false;
-            }
-            else if (IsVersusAi) // Player X vs AI O
-            {
-                Console.WriteLine("Player X's turn.");
-                var result = HandlePlayerTurn(gameInstance);
-                if (result == "RETURN") return "Return"; 
-                if (result == "CONTINUE") gameInstance.IsXTurn = false;
-                if (result == "MENU") return Menus.MainMenu.Run();
-            }
-            else // Player X vs Player O
-            {
-                Console.WriteLine("Player X's turn.");
-                var result = HandlePlayerTurn(gameInstance);
-                if (result == "RETURN") return "Return"; 
-                if (result == "CONTINUE") gameInstance.IsXTurn = false;
-                if (result == "MENU") return Menus.MainMenu.Run();
-            }
-        }
-        else // Player O or AI O's turn
-        {
-            if (AiVersusAi) // AI O turn
-            {
-                Console.WriteLine("AI O's turn.");
-                MakeAiMove(gameInstance, playerO);  
-                if (gameInstance.CheckWin(playerO))
-                {
-                    Visualizer.DrawBoard(gameInstance);
-                    Console.WriteLine("AI O wins!");
-                    return "Game over";
-                }
-                gameInstance.IsXTurn = true;
-            }
-            else if (IsVersusAi) // Player O vs AI X
-            {
-                Console.WriteLine("AI O's turn.");
-                MakeAiMove(gameInstance, playerO);  
-                if (gameInstance.CheckWin(playerO))
-                {
-                    Visualizer.DrawBoard(gameInstance);
-                    Console.WriteLine("AI O wins!");
-                    return "Game over";
-                }
-                gameInstance.IsXTurn = true;
-            }
-            else // Player O vs Player X
-            {
-                Console.WriteLine("Player O's turn.");
-                var result = HandlePlayerTurn(gameInstance);
-                if (result == "RETURN") return "Return"; 
-                if (result == "CONTINUE") gameInstance.IsXTurn = true;
-                if (result == "MENU") return Menus.MainMenu.Run();
-            }
-        }
-
-        // Check for draw (all cells filled, no winner)
-        if (gameInstance.XMoveCount + gameInstance.OMoveCount == gameInstance.DimX * gameInstance.DimY)
-        {
+            Console.WriteLine("Name is" + PlayerName);
             Visualizer.DrawBoard(gameInstance);
-            Console.WriteLine("The game is a draw!");
-            break;
-        }
-    }
 
-    return "Game over";
-}
+            if (gameInstance.IsXTurn)
+            {
+                if (AiVersusAi) 
+                {
+                    Console.WriteLine("AI X's turn.");
+                    MakeAiMove(gameInstance, playerX); 
+                    if (gameInstance.CheckWin(playerX))
+                    {
+                        Visualizer.DrawBoard(gameInstance);
+                        Console.WriteLine("AI X wins!");
+                        return "Game over";
+                    }
+                    gameInstance.IsXTurn = false;
+                }
+                // else if (IsVersusAi)
+                // {
+                //     Console.WriteLine("Player X's turn.");
+                //     var result = HandlePlayerTurn(gameInstance);
+                //     if (result == "RETURN") return "Return"; 
+                //     if (result == "CONTINUE") gameInstance.IsXTurn = false;
+                //     if (result == "MENU") return Menus.MainMenu.Run();
+                // }
+                else
+                {
+                    Console.WriteLine("Player X's turn.");
+                    var result = HandlePlayerTurn(gameInstance);
+                    if (result == "RETURN") return "Return"; 
+                    if (result == "CONTINUE") gameInstance.IsXTurn = false;
+                    if (result == "MENU") return Menus.MainMenu.Run();
+                }
+            }
+            else
+            {
+                if (AiVersusAi) 
+                {
+                    Console.WriteLine("AI O's turn.");
+                    MakeAiMove(gameInstance, playerO);  
+                    if (gameInstance.CheckWin(playerO))
+                    {
+                        Visualizer.DrawBoard(gameInstance);
+                        Console.WriteLine("AI O wins!");
+                        return "Game over";
+                    }
+                    gameInstance.IsXTurn = true;
+                }
+                else if (IsVersusAi) 
+                {
+                    Console.WriteLine("AI O's turn.");
+                    MakeAiMove(gameInstance, playerO);  
+                    if (gameInstance.CheckWin(playerO))
+                    {
+                        Visualizer.DrawBoard(gameInstance);
+                        Console.WriteLine("AI O wins!");
+                        return "Game over";
+                    }
+                    gameInstance.IsXTurn = true;
+                }
+                else 
+                {
+                    Console.WriteLine("Player O's turn.");
+                    var result = HandlePlayerTurn(gameInstance);
+                    if (result == "RETURN") return "Return"; 
+                    if (result == "CONTINUE") gameInstance.IsXTurn = true;
+                    if (result == "MENU") return Menus.MainMenu.Run();
+                }
+            }
+
+            // Check for draw (all cells filled, no winner)
+            if (gameInstance.XMoveCount + gameInstance.OMoveCount == gameInstance.DimX * gameInstance.DimY)
+            {
+                Visualizer.DrawBoard(gameInstance);
+                Console.WriteLine("The game is a draw!");
+                break;
+            }
+        }
+
+        return "Game over";
+    }
 
     private static string HandlePlayerTurn(TicTacTwoBrain gameInstance)
     {
@@ -242,7 +246,9 @@ public static class GameController
     {
         var gameState = gameInstance.GetGameStateAsJson(); 
         var gameType = SelectedGameType;
-        GameRepo.SaveGame(gameState, gameType, SelectedGameConfiguration.Name); 
+        var config = SelectedGameConfiguration;
+        var playerName = PlayerName;
+        GameRepo.SaveGame(gameState, gameType, config.Name, playerName); 
 
         Console.WriteLine("Game saved successfully.");
         Console.WriteLine("Do you want play again? (Y = yes, N = no)");
@@ -267,59 +273,59 @@ public static class GameController
     }
 
     private static void MakeAiMove(TicTacTwoBrain gameInstance, char aiPlayer)
-{
-    // Check if AI can win
-    for (var row = 0; row < gameInstance.DimY; row++)
     {
-        for (var col = 0; col < gameInstance.DimX; col++)
+        // Check if AI can win
+        for (var row = 0; row < gameInstance.DimY; row++)
         {
-            if (gameInstance.GameBoard[row][col] == '.')
+            for (var col = 0; col < gameInstance.DimX; col++)
             {
-                gameInstance.GameBoard[row][col] = aiPlayer; 
-                if (gameInstance.CheckWin(aiPlayer))
-                {
-                    Console.WriteLine($"AI ({aiPlayer}) wins by moving to ({row + 1}, {col + 1})");
-                    return;
-                }
-                gameInstance.GameBoard[row][col] = '.'; 
-            }
-        }
-    }
-
-    // Check if Player X (opponent) can win, then block
-    char opponent = aiPlayer == 'X' ? 'O' : 'X'; 
-    for (var row = 0; row < gameInstance.DimY; row++)
-    {
-        for (var col = 0; col < gameInstance.DimX; col++)
-        {
-            if (gameInstance.GameBoard[row][col] == '.')
-            {
-                gameInstance.GameBoard[row][col] = opponent; 
-                if (gameInstance.CheckWin(opponent))
+                if (gameInstance.GameBoard[row][col] == '.')
                 {
                     gameInstance.GameBoard[row][col] = aiPlayer; 
-                    Console.WriteLine($"AI ({aiPlayer}) blocks {opponent} at ({row + 1}, {col + 1})");
+                    if (gameInstance.CheckWin(aiPlayer))
+                    {
+                        Console.WriteLine($"AI ({aiPlayer}) wins by moving to ({row + 1}, {col + 1})");
+                        return;
+                    }
+                    gameInstance.GameBoard[row][col] = '.'; 
+                }
+            }
+        }
+
+        // Check if Player X (opponent) can win, then block
+        char opponent = aiPlayer == 'X' ? 'O' : 'X'; 
+        for (var row = 0; row < gameInstance.DimY; row++)
+        {
+            for (var col = 0; col < gameInstance.DimX; col++)
+            {
+                if (gameInstance.GameBoard[row][col] == '.')
+                {
+                    gameInstance.GameBoard[row][col] = opponent; 
+                    if (gameInstance.CheckWin(opponent))
+                    {
+                        gameInstance.GameBoard[row][col] = aiPlayer; 
+                        Console.WriteLine($"AI ({aiPlayer}) blocks {opponent} at ({row + 1}, {col + 1})");
+                        return;
+                    }
+                    gameInstance.GameBoard[row][col] = '.'; 
+                }
+            }
+        }
+
+        // If AI can't win or block, make a simple move
+        for (var row = 0; row < gameInstance.DimY; row++)
+        {
+            for (var col = 0; col < gameInstance.DimX; col++)
+            {
+                if (gameInstance.GameBoard[row][col] == '.')
+                {
+                    gameInstance.GameBoard[row][col] = aiPlayer; 
+                    Console.WriteLine($"AI ({aiPlayer}) moves to ({row + 1}, {col + 1})");
                     return;
                 }
-                gameInstance.GameBoard[row][col] = '.'; 
             }
         }
     }
-
-    // If AI can't win or block, make a simple move
-    for (var row = 0; row < gameInstance.DimY; row++)
-    {
-        for (var col = 0; col < gameInstance.DimX; col++)
-        {
-            if (gameInstance.GameBoard[row][col] == '.')
-            {
-                gameInstance.GameBoard[row][col] = aiPlayer; 
-                Console.WriteLine($"AI ({aiPlayer}) moves to ({row + 1}, {col + 1})");
-                return;
-            }
-        }
-    }
-}
 
     private static bool HandlePlacePiece(TicTacTwoBrain gameInstance)
     {
