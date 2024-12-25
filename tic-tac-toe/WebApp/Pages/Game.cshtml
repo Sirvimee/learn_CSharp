@@ -53,8 +53,6 @@
         <div class="col-sm"></div>
         <div class="col-sm">
             <h3 style="text-align: center">@(Model.GameInstance.IsXTurn ? "X " : "O ")turn</h3>
-            <p>Mängustiil: @Model.GameType</p>
-            <p>Mängunimi: @Model.CurrentGameName</p>
             <form method="post" asp-page-handler="SetPiece">
                 <div class="board">
                     @for (int y = 0; y < Model.DimY; y++)
@@ -112,7 +110,7 @@
                         <button type="submit" asp-page-handler="SaveGame" class="btn btn-primary">Save Game</button>
                     </form>
 
-                    @if (Model.GameType == "Player vs AI" && !Model.GameInstance.IsXTurn)
+                    @if (Model.GameType == "Player vs AI" && !Model.GameInstance.IsXTurn || Model.GameType == "AI vs AI")
                     {
                         <form method="post" asp-page-handler="AiMove">
                             <button type="submit" class="btn btn-success m-2" 
@@ -130,6 +128,14 @@
 {
     <script>
         alert("@TempData["WinMessage"]");
+        window.location.href = `/`;
+    </script>
+}
+
+@if (TempData["GameSaved"] != null)
+{
+    <script>
+        alert("@TempData["GameSaved"]");
         window.location.href = `/`;
     </script>
 }

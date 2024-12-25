@@ -166,7 +166,12 @@ public class Game : PageModel
         var savedGameName = SaveGameToDatabase();
         GameRepo.DeleteGame(CurrentGameName!);
         CurrentGameName = savedGameName;
-        return Content($"Game saved successfully with name: {CurrentGameName}");
+        // return Content($"Game saved successfully with name: {CurrentGameName}");
+        
+        TempData["GameSaved"] = $"Game saved successfully with name: {CurrentGameName}";
+        HttpContext.Session.Remove("CurrentGameName");
+        InitializeGame();
+        return Page();
     }
 
     public IActionResult OnPostMoveGrid(string direction)
