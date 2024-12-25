@@ -50,9 +50,62 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-sm"></div>
+        <div class="col text-end">
+            <h3>@(Model.GameInstance.IsXTurn ? "X " : "O ")turn</h3>
+        </div>
+        <div class="col">
+            @if (Model.GameType == "Player vs AI" && !Model.GameInstance.IsXTurn || Model.GameType == "AI vs AI")
+            {
+                <form method="post" asp-page-handler="AiMove">
+                    <button type="submit" class="btn btn-success m-2"
+                            formaction="/Game?handler=AiMove&CurrentGameName=@Model.CurrentGameName">AI Move</button>
+                </form>
+            }
+        </div>
+    </div>
+    <div class="row">
         <div class="col-sm">
-            <h3 style="text-align: center">@(Model.GameInstance.IsXTurn ? "X " : "O ")turn</h3>
+            @if (Model.GameInstance.MovePieceAfterNMoves <= 0)
+            {
+                <div class="row">
+                    <div class="text-center">
+                        <br/>
+                        <h3 class="text-center">Move piece</h3>
+                        <form method="post" asp-page-handler="MovePiece">
+                            <input type="hidden" name="CurrentGameName" value="@Model.CurrentGameName"/>
+                            <div class="form-group row">
+                                <label for="fromRow" class="col-sm-5 col-form-label text-sm-end">From Row:</label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control" id="fromRow" name="fromRow" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="fromCol" class="col-sm-5 col-form-label text-sm-end">From Col:</label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control" id="fromCol" name="fromCol" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="toRow" class="col-sm-5 col-form-label text-sm-end">To Row:</label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control" id="toRow" name="toRow" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="toCol" class="col-sm-5 col-form-label text-sm-end">To Col:</label>
+                                <div class="col-sm-5">
+                                    <input type="number" class="form-control" id="toCol" name="toCol" required>
+                                </div>
+                            </div>
+                            <br/>
+                            <button type="submit" class="btn btn-primary m-2">Move Piece</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-sm">
             <form method="post" asp-page-handler="SetPiece">
                 <div class="board">
                     @for (int y = 0; y < Model.DimY; y++)
@@ -71,53 +124,58 @@
                     }
                 </div>
             </form>
-
         </div>
 
         <div class="col-sm">
+            @if (Model.GameInstance.MovePieceAfterNMoves <= 0)
+            {
+                <form method="post" asp-page-handler="MoveGrid">
+                    <div class="row">
+                        <h3 class="text-center">Move grid</h3>
+                        <div class="text-center">
+                            <button class="btn btn-light" asp-page-handler="MoveGrid" asp-route-direction="up_left" asp-route-CurrentGameName="@Model.CurrentGameName">
+                                <i class="bi-arrow-up-left-square-fill" style="font-size: 40px; color: #0d6efd"></i>
+                            </button>
+                            <button class="btn btn-light" asp-page-handler="MoveGrid" asp-route-direction="up" asp-route-CurrentGameName="@Model.CurrentGameName">
+                                <i class="bi-arrow-up-square-fill" style="font-size: 40px; color: #0d6efd"></i>
+                            </button>
+                            <button class="btn btn-light" asp-page-handler="MoveGrid" asp-route-direction="up_right" asp-route-CurrentGameName="@Model.CurrentGameName">
+                                <i class="bi-arrow-up-right-square-fill" style="font-size: 40px; color: #0d6efd"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="text-center">
+                            <button class="btn btn-light" asp-page-handler="MoveGrid" asp-route-direction="left" asp-route-CurrentGameName="@Model.CurrentGameName">
+                                <i class="bi-arrow-left-square-fill" style="font-size: 40px; color: #0d6efd"></i>
+                            </button>
+                            <button class="btn btn-light" asp-page-handler="MoveGrid" asp-route-direction="right" asp-route-CurrentGameName="@Model.CurrentGameName">
+                                <i class="bi-arrow-right-square-fill" style="font-size: 40px; color: #0d6efd"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="text-center">
+                            <button class="btn btn-light" asp-page-handler="MoveGrid" asp-route-direction="down_left" asp-route-CurrentGameName="@Model.CurrentGameName">
+                                <i class="bi-arrow-down-left-square-fill" style="font-size: 40px; color: #0d6efd"></i>
+                            </button>
+                            <button class="btn btn-light" asp-page-handler="MoveGrid" asp-route-direction="down" asp-route-CurrentGameName="@Model.CurrentGameName">
+                                <i class="bi-arrow-down-square-fill" style="font-size: 40px; color: #0d6efd"></i>
+                            </button>
+                            <button class="btn btn-light" asp-page-handler="MoveGrid" asp-route-direction="down_right" asp-route-CurrentGameName="@Model.CurrentGameName">
+                                <i class="bi-arrow-down-right-square-fill" style="font-size: 40px; color: #0d6efd"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            }
             <div class="row">
-                <p class="text-center">Move grid</p>
                 <div class="text-center">
-                    <a href="/Game?handler=MoveGrid&direction=up_left&CurrentGameName=@Model.CurrentGameName">
-                        <i class="bi-arrow-up-left-square-fill" style="font-size: 40px;"></i>
-                    </a>
-                    <a href="/Game?handler=MoveGrid&direction=up&CurrentGameName=@Model.CurrentGameName">
-                        <i class="bi-arrow-up-square-fill" style="font-size: 40px;"></i>
-                    </a>
-                    <a href="/Game?handler=MoveGrid&direction=up_right&CurrentGameName=@Model.CurrentGameName">
-                        <i class="bi-arrow-up-right-square-fill" style="font-size: 40px;"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="text-center">
-                    <a href="/Game?handler=MoveGrid&direction=down_left&CurrentGameName=@Model.CurrentGameName">
-                        <i class="bi-arrow-down-left-square-fill" style="font-size: 40px;"></i>
-                    </a>
-                    <a href="/Game?handler=MoveGrid&direction=down&CurrentGameName=@Model.CurrentGameName">
-                        <i class="bi-arrow-down-square-fill" style="font-size: 40px;"></i>
-                    </a>
-                    <a href="/Game?handler=MoveGrid&direction=down_right&CurrentGameName=@Model.CurrentGameName">
-                        <i class="bi-arrow-down-right-square-fill" style="font-size: 40px;"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="text-center">
-                    <p></p>
+                    <br/>
                     <form method="post">
-                        <input type="hidden" name="CurrentGameName" value="@Model.CurrentGameName" />
+                        <input type="hidden" name="CurrentGameName" value="@Model.CurrentGameName"/>
                         <button type="submit" asp-page-handler="SaveGame" class="btn btn-primary">Save Game</button>
                     </form>
-
-                    @if (Model.GameType == "Player vs AI" && !Model.GameInstance.IsXTurn || Model.GameType == "AI vs AI")
-                    {
-                        <form method="post" asp-page-handler="AiMove">
-                            <button type="submit" class="btn btn-success m-2" 
-                                    formaction="/Game?handler=AiMove&CurrentGameName=@Model.CurrentGameName"
-                                    >AI Move</button>
-                        </form>
-                    }
                 </div>
             </div>
         </div>
@@ -128,14 +186,6 @@
 {
     <script>
         alert("@TempData["WinMessage"]");
-        window.location.href = `/`;
-    </script>
-}
-
-@if (TempData["GameSaved"] != null)
-{
-    <script>
-        alert("@TempData["GameSaved"]");
         window.location.href = `/`;
     </script>
 }

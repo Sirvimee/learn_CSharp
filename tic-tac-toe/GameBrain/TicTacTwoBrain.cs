@@ -15,10 +15,9 @@ namespace GameBrain
         public int SmallBoardHeight { get; set; }
         
         public string GameType { get; set; } = null!;
-
-        public int XMoveCount { get; set; }
-        public int OMoveCount { get; set; }
-        public GameConfiguration Configuration { get; set; }
+        
+        public int MovePieceAfterNMoves { get; set; } = 2;
+        public GameConfiguration Configuration { get; set; } = null!;
 
         public TicTacTwoBrain()
         {
@@ -105,6 +104,7 @@ namespace GameBrain
                         if (CheckWin(opponent))
                         {
                             GameBoard[row][col] = aiPlayer; 
+                            if (!IsXTurn) MovePieceAfterNMoves--;
                             return true;
                         }
                         GameBoard[row][col] = '.'; 
@@ -121,8 +121,7 @@ namespace GameBrain
                     {
                         GameBoard[row][col] = aiPlayer; 
                         Console.WriteLine($"AI ({aiPlayer}) moves to ({row + 1}, {col + 1})");
-                        if (IsXTurn) XMoveCount++;
-                        else OMoveCount++;
+                        if (!IsXTurn) MovePieceAfterNMoves--;
                         return true;
                     }
                 }
@@ -141,8 +140,7 @@ namespace GameBrain
             if (GameBoard[row][col] == '.')
             {
                 GameBoard[row][col] = IsXTurn ? 'X' : 'O';
-                if (IsXTurn) XMoveCount++;
-                else OMoveCount++;
+                if (!IsXTurn) MovePieceAfterNMoves--;
                 return true;
             }
             else
@@ -154,6 +152,11 @@ namespace GameBrain
         
         public bool MovePiece(int fromRow, int fromCol, int toRow, int toCol)
         {
+            fromRow -= 1;
+            fromCol -= 1;
+            toRow -= 1;
+            toCol -= 1;
+            
             if (fromRow < 0 || fromRow >= DimX || fromCol < 0 || fromCol >= DimY)
             {
                 Console.WriteLine("Invalid source coordinates. Try again.");

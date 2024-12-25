@@ -22,7 +22,7 @@ public class ConfigRepositoryJson : IConfigRepository
     {
         var configJsonStr = System.IO.File.ReadAllText(FileHelper.BasePath + name + FileHelper.ConfigExtension);
         var config = System.Text.Json.JsonSerializer.Deserialize<GameConfiguration>(configJsonStr);
-        return config;
+        return config!;
     }
 
     public void SaveConfiguration(GameConfiguration gameConfig)

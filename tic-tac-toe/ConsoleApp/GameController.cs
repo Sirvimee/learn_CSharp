@@ -124,18 +124,17 @@ public static class GameController
 
     private static string HandlePlayerTurn(TicTacTwoBrain gameInstance)
     {
-        if ((gameInstance.IsXTurn && gameInstance.XMoveCount >= 2) ||
-            (!gameInstance.IsXTurn && gameInstance.OMoveCount >= 2))
+        switch (gameInstance.MovePieceAfterNMoves)
         {
-            Console.WriteLine("Choose action: (1) Place piece, (2) Move grid, (3) Move piece, (S) Save game, (E) Exit game");
-        }
-        else if (gameInstance.XMoveCount < 1)
-        {
-            Console.WriteLine("Choose action: (1) Place piece, (S) Save game, (R) Return, (E) Exit game");
-        }
-        else
-        {
-            Console.WriteLine("Choose action: (1) Place piece, (S) Save game, (E) Exit game");
+            case >= 2:
+                Console.WriteLine("Choose action: (1) Place piece, (S) Save game, (R) Return, (E) Exit game");
+                break;
+            case 1:
+                Console.WriteLine("Choose action: (1) Place piece, (S) Save game, (E) Exit game");
+                break;
+            default:
+                Console.WriteLine("Choose action: (1) Place piece, (2) Move grid, (3) Move piece, (S) Save game, (E) Exit game");
+                break;
         }
 
         string? action = Console.ReadLine();
@@ -196,11 +195,6 @@ public static class GameController
             int.TryParse(input[2], out int toRow) &&
             int.TryParse(input[3], out int toCol))
         {
-            fromRow -= 1;
-            fromCol -= 1;
-            toRow -= 1;
-            toCol -= 1;
-            
             if (gameInstance.MovePiece(fromRow, fromCol, toRow, toCol))
             {
                 return true;

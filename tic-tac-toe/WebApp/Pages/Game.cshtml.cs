@@ -15,7 +15,7 @@ public class Game : PageModel
     public int SmallBoardEndY { get; set; }
 
     public TicTacTwoBrain GameInstance { get; set; } = null!;
-    public GameConfiguration GameConfig { get; set; }
+    public GameConfiguration GameConfig { get; set; } = new GameConfiguration();
     private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb();
     
     public string GameType { get; set; } = "Default";
@@ -113,6 +113,42 @@ public class Game : PageModel
 
         return Page();
     }
+    
+    public IActionResult OnPostMovePiece(int fromRow, int fromCol, int toRow, int toCol)
+    {
+        if (string.IsNullOrEmpty(CurrentGameName))
+        {
+            return Content("Error: CurrentGameName is not set.");
+        }
+        
+        LoadGameFromDatabase(CurrentGameName!);
+
+        if (GameInstance.MovePiece(fromRow, fromCol, toRow, toCol))
+        {
+            if (GameInstance.CheckWin(GameInstance.IsXTurn ? 'X' : 'O'))
+            {
+                TempData["WinMessage"] = $"Player {(GameInstance.IsXTurn ? "X" : "O")} wins!";
+                GameRepo.DeleteGame(CurrentGameName);
+                HttpContext.Session.Remove("CurrentGameName");
+                InitializeGame();
+            }
+            else
+            {
+                GameInstance.IsXTurn = !GameInstance.IsXTurn;
+                GameRepo.UpdateGame(CurrentGameName, GameInstance.GetGameStateAsJson());
+            }
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Invalid piece movement.";
+        }
+
+        DimX = GameInstance.DimX;
+        DimY = GameInstance.DimY;
+        SetBoardDimensions();
+
+        return Page();
+    }
 
     private void InitializeGame()
     {
@@ -166,28 +202,62 @@ public class Game : PageModel
         var savedGameName = SaveGameToDatabase();
         GameRepo.DeleteGame(CurrentGameName!);
         CurrentGameName = savedGameName;
-        // return Content($"Game saved successfully with name: {CurrentGameName}");
-        
-        TempData["GameSaved"] = $"Game saved successfully with name: {CurrentGameName}";
-        HttpContext.Session.Remove("CurrentGameName");
-        InitializeGame();
-        return Page();
+        return Content($"Game saved successfully with name: {CurrentGameName}");
     }
 
     public IActionResult OnPostMoveGrid(string direction)
     {
-        bool moved = direction switch
+        if (string.IsNullOrEmpty(CurrentGameName))
         {
-            "up" => GameInstance.MoveGrid(-1, 0),
-            "up_left" => GameInstance.MoveGrid(-1, -1),
-            "up_right" => GameInstance.MoveGrid(-1, 1),
-            "down" => GameInstance.MoveGrid(1, 0),
-            "down_left" => GameInstance.MoveGrid(1, -1),
-            "down_right" => GameInstance.MoveGrid(1, 1),
-            "left" => GameInstance.MoveGrid(0, -1),
-            "right" => GameInstance.MoveGrid(0, 1),
-            _ => false
-        };
+            return Content("Error: CurrentGameName is not set.");
+        }
+        
+        LoadGameFromDatabase(CurrentGameName);
+
+        switch (direction)
+        {
+            case "up":
+                GameInstance.MoveGrid(-1, 0);
+                break;
+            case "up_left":
+                GameInstance.MoveGrid(-1, -1);
+                break;
+            case "up_right":
+                GameInstance.MoveGrid(-1, 1);
+                break;
+            case "down_left":
+                GameInstance.MoveGrid(1, -1);
+                break;
+            case "down_right":
+                GameInstance.MoveGrid(1, 1);
+                break;
+            case "down":
+                GameInstance.MoveGrid(1, 0);
+                break;
+            case "left":
+                GameInstance.MoveGrid(0, -1);
+                break;
+            case "right":
+                GameInstance.MoveGrid(0, 1);
+                break;
+        }
+
+        if (GameInstance.CheckWin(GameInstance.IsXTurn ? 'X' : 'O'))
+        {
+            TempData["WinMessage"] = $"Player {(GameInstance.IsXTurn ? "X" : "O")} wins!";
+            GameRepo.DeleteGame(CurrentGameName);
+            HttpContext.Session.Remove("CurrentGameName");
+            InitializeGame();
+        }
+        else
+        {
+            GameInstance.IsXTurn = !GameInstance.IsXTurn;
+            GameRepo.UpdateGame(CurrentGameName, GameInstance.GetGameStateAsJson());
+        }
+        
+        DimX = GameInstance.DimX;
+        DimY = GameInstance.DimY;
+        SetBoardDimensions();
 
         return Page();
     }

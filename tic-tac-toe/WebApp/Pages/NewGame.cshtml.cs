@@ -39,8 +39,7 @@ public class NewGame : PageModel
             BoardSizeHeight = config.BoardSizeHeight,
             GridSizeWidth = config.GridSizeWidth,
             GridSizeHeight = config.GridSizeHeight,
-            WinCondition = config.WinCondition,
-            MovePieceAfterNMoves = config.MovePieceAfterNMoves
+            WinCondition = config.WinCondition
         };
         
         return RedirectToPage("/Game");

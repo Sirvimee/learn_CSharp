@@ -14,7 +14,6 @@ public class ConfigRepositoryHardcoded : IConfigRepository
             GridSizeHeight = 3,
             GridSizeWidth = 3,
             WinCondition = 3,
-            MovePieceAfterNMoves = 2,
             BoardType = "Classical"
         },
         new GameConfiguration()
@@ -25,7 +24,6 @@ public class ConfigRepositoryHardcoded : IConfigRepository
             GridSizeHeight = 4,
             GridSizeWidth = 4,
             WinCondition = 4,
-            MovePieceAfterNMoves = 2,
             BoardType = "Big board"
         },
     };
