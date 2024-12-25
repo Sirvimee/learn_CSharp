@@ -145,20 +145,11 @@ public class Game : PageModel
         GameType = GameInstance.Configuration.GameType;
         PlayerName = GameInstance.Configuration.PlayerName;
         BoardType = GameInstance.Configuration.BoardType;
-        
-        SetGameInfo(GameType, PlayerName, BoardType);
 
         DimX = GameInstance.DimX;
         DimY = GameInstance.DimY;
 
         SetBoardDimensions();
-    }
-    
-    private void SetGameInfo(string gameType, string playerName, string boardType)
-    {
-        GameType = gameType;
-        PlayerName = playerName;
-        BoardType = boardType;
     }
 
     private void SetBoardDimensions()
