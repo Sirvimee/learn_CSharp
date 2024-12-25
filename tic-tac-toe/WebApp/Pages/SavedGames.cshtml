@@ -1,0 +1,29 @@
+@page
+@model WebApp.Pages.SavedGames
+
+<div class="row">
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-4 text-center">
+        <div class="form-group">
+            <a asp-page="./NewGame" asp-route-playerName="@Model.PlayerName" class="btn btn-success m-2">Start New Game</a>
+        </div>
+        <div class="form-group">
+            <h3>Saved Games</h3>
+            @if (Model.SavedGamesList.Any())
+            {
+                @foreach (var gameName in Model.SavedGamesList)
+                {
+                    <form method="post" asp-page-handler="LoadGame">
+                        <input type="hidden" name="GameName" value="@gameName" />
+                        <button type="submit" class="btn btn-primary m-2">@gameName</button>
+                    </form>
+                }
+            }
+            else
+            {
+                <p>No saved games found.</p>
+            }
+        </div>
+    </div>
+</div>

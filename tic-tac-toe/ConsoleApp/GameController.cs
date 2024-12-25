@@ -75,6 +75,12 @@ public static class GameController
                 Environment.Exit(0); 
             }
 
+            if (gameInstance.CheckDraw())
+            {
+                Console.WriteLine("The game is a draw!");
+                Environment.Exit(0); 
+            }
+
             if (gameInstance.IsXTurn)
             {
                 LastPlayerPiece = 'X';
@@ -113,17 +119,7 @@ public static class GameController
                     if (result == "MENU") return Menus.MainMenu.Run();
                 }
             }
-
-            // Check for draw (all cells filled, no winner)
-            if (gameInstance.XMoveCount + gameInstance.OMoveCount == gameInstance.DimX * gameInstance.DimY)
-            {
-                Visualizer.DrawBoard(gameInstance);
-                Console.WriteLine("The game is a draw!");
-                break;
-            }
         }
-
-        return "Game over";
     }
 
     private static string HandlePlayerTurn(TicTacTwoBrain gameInstance)
@@ -228,7 +224,7 @@ public static class GameController
         var gameType = SelectedGameType;
         var config = SelectedGameConfiguration;
         var playerName = PlayerName;
-        GameRepo.SaveGame(gameState, gameType, config.Name, playerName); 
+        GameRepo.SaveGame(gameState, config.Name, gameType, playerName); 
 
         Console.WriteLine("Game saved successfully.");
         Console.WriteLine("Do you want play again? (Y = yes, N = no)");
@@ -256,31 +252,24 @@ public static class GameController
     {
         Console.WriteLine("Enter row and column to place piece (e.g., 1,1):");
         var input = Console.ReadLine()?.Split(",");
-        // char currentPlayerPiece = gameInstance.IsXTurn ? 'X' : 'O';
+        
         if (input?.Length == 2 &&
             int.TryParse(input[0], out int row) &&
             int.TryParse(input[1], out int col))
+        {
+            row -= 1;
+            col -= 1;
+
+            if (gameInstance.MakeAMove(row, col))
             {
-                row -= 1;
-                col -= 1;
-
-                if (gameInstance.MakeAMove(row, col))
-                {
-                    // if (gameInstance.CheckWin(currentPlayerPiece))
-                    // {
-                    //     Visualizer.DrawBoard(gameInstance);
-                    //     Console.WriteLine($"Player {(gameInstance.IsXTurn ? "X" : "O")} wins!");
-                    //     Environment.Exit(0); 
-                    // }
-
-                    return true;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid move, try again.");
-                    return false;
-                }
+                return true;
             }
+            else
+            {
+                Console.WriteLine("Invalid move, try again.");
+                return false;
+            }
+        }
         else
         {
             Console.WriteLine("Invalid input.");

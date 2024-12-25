@@ -1,0 +1,50 @@
+@page
+@model WebApp.Pages.NewGame
+
+<div class="row">
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-4 text-center">
+        <form method="post">
+            <!-- Game Type -->
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="GameType" id="player_player" value="Player vs Player" autocomplete="off" onchange="checkSelection()">
+                <label class="btn btn-outline-primary" for="player_player">Player vs Player</label>
+
+                <input type="radio" class="btn-check" name="GameType" id="player_ai" value="Player vs AI" autocomplete="off" onchange="checkSelection()">
+                <label class="btn btn-outline-primary" for="player_ai">Player vs AI</label>
+
+                <input type="radio" class="btn-check" name="GameType" id="ai_ai" value="AI vs AI" autocomplete="off" onchange="checkSelection()">
+                <label class="btn btn-outline-primary" for="ai_ai">AI vs AI</label>
+            </div>
+
+            <br /><br />
+
+            <!-- Board Type -->
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="BoardType" id="classical" value="Classical" autocomplete="off" onchange="checkSelection()">
+                <label class="btn btn-outline-primary" for="classical">Classical</label>
+
+                <input type="radio" class="btn-check" name="BoardType" id="big" value="Big board" autocomplete="off" onchange="checkSelection()">
+                <label class="btn btn-outline-primary" for="big">Big board</label>
+            </div>
+
+            <br /><br />
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <input type="submit" id="submitButton" value="OK" class="btn btn-primary" disabled />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function checkSelection() {
+        const gameModeSelected = document.querySelector('input[name="GameType"]:checked');
+        const boardTypeSelected = document.querySelector('input[name="BoardType"]:checked');
+        
+        const submitButton = document.getElementById('submitButton');
+        submitButton.disabled = !(gameModeSelected && boardTypeSelected);
+    }
+</script>

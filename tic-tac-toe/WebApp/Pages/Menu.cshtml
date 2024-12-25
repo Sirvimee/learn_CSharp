@@ -1,0 +1,15 @@
+@page
+@model WebApp.Pages.Menu
+
+<div class="row">
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-4 text-center">
+        <form method="post">
+            <div class="form-group">
+                <a asp-page="./NewGame" asp-route-playerName="@Model.PlayerName" class="btn btn-primary">Start New Game</a>
+                <a asp-page="./SavedGames" asp-route-playerName="@Model.PlayerName"  class="btn btn-primary">Continue Game</a>
+            </div>
+        </form>
+    </div>
+</div>

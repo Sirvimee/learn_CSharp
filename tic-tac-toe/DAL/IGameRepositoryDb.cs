@@ -2,5 +2,5 @@ namespace DAL;
 
 public interface IGameRepositoryDb
 {
-    public void SaveGame(string gameState, string configName);
+    public int SaveGame(string gameState, string configName);
 }

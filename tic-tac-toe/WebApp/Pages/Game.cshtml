@@ -1,0 +1,138 @@
+@page
+@model WebApp.Pages.Game
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(@Model.DimX, 50px);
+            grid-gap: 5px;
+            margin: 20px auto;
+            width: max-content;
+        }
+
+        .board button {
+            width: 50px;
+            height: 50px;
+            font-size: 18px;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+
+        .small-board {
+            background-color: cyan;
+            color: black;
+        }
+
+        .regular-board {
+            background-color: white;
+            color: black;
+        }
+
+        .board button:disabled {
+            cursor: not-allowed;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .controls button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm"></div>
+        <div class="col-sm">
+            <h3 style="text-align: center">@(Model.GameInstance.IsXTurn ? "X " : "O ")turn</h3>
+            <p>Mängustiil: @Model.GameType</p>
+            <p>Mängunimi: @Model.CurrentGameName</p>
+            <form method="post" asp-page-handler="SetPiece">
+                <div class="board">
+                    @for (int y = 0; y < Model.DimY; y++)
+                    {
+                        for (int x = 0; x < Model.DimX; x++)
+                        {
+                            var isSmallBoard = x >= Model.SmallBoardStartX && x < Model.SmallBoardEndX &&
+                                               y >= Model.SmallBoardStartY && y < Model.SmallBoardEndY;
+                            var cssClass = isSmallBoard ? "small-board" : "regular-board";
+                            <button type="submit" name="x" value="@x"
+                                    formaction="/Game?handler=SetPiece&x=@x&y=@y&CurrentGameName=@Model.CurrentGameName"
+                                    class="@cssClass">
+                                @Model.GameInstance.GameBoard[y][x]
+                            </button>
+                        }
+                    }
+                </div>
+            </form>
+
+        </div>
+
+        <div class="col-sm">
+            <div class="row">
+                <p class="text-center">Move grid</p>
+                <div class="text-center">
+                    <a href="/Game?handler=MoveGrid&direction=up_left&CurrentGameName=@Model.CurrentGameName">
+                        <i class="bi-arrow-up-left-square-fill" style="font-size: 40px;"></i>
+                    </a>
+                    <a href="/Game?handler=MoveGrid&direction=up&CurrentGameName=@Model.CurrentGameName">
+                        <i class="bi-arrow-up-square-fill" style="font-size: 40px;"></i>
+                    </a>
+                    <a href="/Game?handler=MoveGrid&direction=up_right&CurrentGameName=@Model.CurrentGameName">
+                        <i class="bi-arrow-up-right-square-fill" style="font-size: 40px;"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="text-center">
+                    <a href="/Game?handler=MoveGrid&direction=down_left&CurrentGameName=@Model.CurrentGameName">
+                        <i class="bi-arrow-down-left-square-fill" style="font-size: 40px;"></i>
+                    </a>
+                    <a href="/Game?handler=MoveGrid&direction=down&CurrentGameName=@Model.CurrentGameName">
+                        <i class="bi-arrow-down-square-fill" style="font-size: 40px;"></i>
+                    </a>
+                    <a href="/Game?handler=MoveGrid&direction=down_right&CurrentGameName=@Model.CurrentGameName">
+                        <i class="bi-arrow-down-right-square-fill" style="font-size: 40px;"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="text-center">
+                    <p></p>
+                    <form method="post">
+                        <input type="hidden" name="CurrentGameName" value="@Model.CurrentGameName" />
+                        <button type="submit" asp-page-handler="SaveGame" class="btn btn-primary">Save Game</button>
+                    </form>
+
+                    @if (Model.GameType == "Player vs AI" && !Model.GameInstance.IsXTurn)
+                    {
+                        <form method="post" asp-page-handler="AiMove">
+                            <button type="submit" class="btn btn-success m-2" 
+                                    formaction="/Game?handler=AiMove&CurrentGameName=@Model.CurrentGameName"
+                                    >AI Move</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["WinMessage"] != null)
+{
+    <script>
+        alert("@TempData["WinMessage"]");
+        window.location.href = `/`;
+    </script>
+}
+
+</body>
+</html>

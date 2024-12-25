@@ -13,6 +13,8 @@ namespace GameBrain
         public int SmallBoardPosY { get; set; }
         public int SmallBoardWidth { get; set; }
         public int SmallBoardHeight { get; set; }
+        
+        public string GameType { get; set; } = null!;
 
         public int XMoveCount { get; set; }
         public int OMoveCount { get; set; }
@@ -29,6 +31,7 @@ namespace GameBrain
             DimX = config.BoardSizeWidth;
             DimY = config.BoardSizeHeight;
             GameBoard = InitializeGameBoard(DimX, DimY);
+            GameType = config.GameType;
             IsXTurn = true;
 
             SmallBoardWidth = config.GridSizeWidth;
@@ -250,6 +253,16 @@ namespace GameBrain
             }
 
             return false;
+        }
+        
+        public bool CheckDraw()
+        {
+            return GameBoard.All(row => row.All(cell => cell != '.'));
+        }
+        
+        public char GetPieceAt(int x, int y)
+        {
+            return GameBoard[y][x];
         }
     }
 }

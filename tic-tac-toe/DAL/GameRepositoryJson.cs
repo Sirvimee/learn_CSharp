@@ -2,7 +2,7 @@ namespace DAL
 {
     public class GameRepositoryJson : IGameRepository
     {
-        public void SaveGame(string jsonStateString, string gameConfigName, string gameType, string playerName)
+        public string SaveGame(string jsonStateString, string gameConfigName, string gameType, string playerName)
         {
             var directoryPath = FileHelper.BasePath;
             if (!Directory.Exists(directoryPath))
@@ -11,13 +11,15 @@ namespace DAL
             }
 
             var fileName = directoryPath +
-                           playerName + " " +
-                           gameType + " " + 
-                           gameConfigName + " " +
+                           playerName + "_" +
+                           gameType + "_" + 
+                           gameConfigName + "_" +
                            DateTime.Now.ToString("dd/MM/yyy_HH-mm-ss") +
                            FileHelper.GameExtension;
 
             File.WriteAllText(fileName, jsonStateString);
+            
+            return Path.GetFileNameWithoutExtension(fileName);
         }
 
         public List<string?> GetSavedGames(string playerName)
@@ -31,7 +33,7 @@ namespace DAL
             return Directory
                 .GetFiles(directoryPath, "*" + FileHelper.GameExtension)
                 .Select(Path.GetFileNameWithoutExtension)
-                .Where(fileName => fileName?.StartsWith(playerName + " ") ?? false) 
+                .Where(fileName => fileName?.StartsWith(playerName + "_") ?? false) 
                 .ToList();
         }
 
