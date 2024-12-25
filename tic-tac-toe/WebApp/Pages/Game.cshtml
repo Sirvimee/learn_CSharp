@@ -5,44 +5,14 @@
 <html>
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/game.css" asp-append-version="true">
     <style>
         .board {
             display: grid;
-            grid-template-columns: repeat(@Model.DimX, 50px);
+            grid-template-columns: repeat(@Model.ViewModel.DimX, 50px);
             grid-gap: 5px;
             margin: 20px auto;
             width: max-content;
-        }
-
-        .board button {
-            width: 50px;
-            height: 50px;
-            font-size: 18px;
-            border: 1px solid #333;
-            cursor: pointer;
-        }
-
-        .small-board {
-            background-color: cyan;
-            color: black;
-        }
-
-        .regular-board {
-            background-color: white;
-            color: black;
-        }
-
-        .board button:disabled {
-            cursor: not-allowed;
-        }
-
-        .controls {
-            text-align: center;
-            margin: 20px;
-        }
-
-        .controls button {
-            margin: 5px;
         }
     </style>
 </head>
@@ -51,10 +21,10 @@
 <div class="container">
     <div class="row">
         <div class="col text-end">
-            <h3>@(Model.GameInstance.IsXTurn ? "X " : "O ")turn</h3>
+            <h3>@(Model.GameInstance.IsXTurn ? "X " : "O ") turn</h3>
         </div>
         <div class="col">
-            @if (Model.GameType == "Player vs AI" && !Model.GameInstance.IsXTurn || Model.GameType == "AI vs AI")
+            @if (Model.ViewModel.GameType == "Player vs AI" && !Model.GameInstance.IsXTurn || Model.ViewModel.GameType == "AI vs AI")
             {
                 <form method="post" asp-page-handler="AiMove">
                     <button type="submit" class="btn btn-success m-2"
@@ -108,12 +78,12 @@
         <div class="col-sm">
             <form method="post" asp-page-handler="SetPiece">
                 <div class="board">
-                    @for (int y = 0; y < Model.DimY; y++)
+                    @for (int y = 0; y < Model.ViewModel.DimY; y++)
                     {
-                        for (int x = 0; x < Model.DimX; x++)
+                        for (int x = 0; x < Model.ViewModel.DimX; x++)
                         {
-                            var isSmallBoard = x >= Model.SmallBoardStartX && x < Model.SmallBoardEndX &&
-                                               y >= Model.SmallBoardStartY && y < Model.SmallBoardEndY;
+                            var isSmallBoard = x >= Model.ViewModel.SmallBoardStartX && x < Model.ViewModel.SmallBoardEndX &&
+                                               y >= Model.ViewModel.SmallBoardStartY && y < Model.ViewModel.SmallBoardEndY;
                             var cssClass = isSmallBoard ? "small-board" : "regular-board";
                             <button type="submit" name="x" value="@x"
                                     formaction="/Game?handler=SetPiece&x=@x&y=@y&CurrentGameName=@Model.CurrentGameName"

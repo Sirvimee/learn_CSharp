@@ -113,20 +113,27 @@ namespace GameBrain
             }
 
             // If AI can't win or block, make a simple move
+            var possibleMoves = new List<(int row, int col)>();
+            
             for (var row = 0; row < DimY; row++)
             {
                 for (var col = 0; col < DimX; col++)
                 {
                     if (GameBoard[row][col] == '.')
                     {
-                        GameBoard[row][col] = aiPlayer; 
-                        Console.WriteLine($"AI ({aiPlayer}) moves to ({row + 1}, {col + 1})");
-                        if (!IsXTurn) MovePieceAfterNMoves--;
-                        return true;
+                        possibleMoves.Add((row, col));
                     }
                 }
             }
-            return false;
+
+            var random = new Random();
+            var move = possibleMoves[random.Next(possibleMoves.Count)];
+
+            GameBoard[move.row][move.col] = aiPlayer;
+            Console.WriteLine($"AI ({aiPlayer}) moves to ({move.row + 1}, {move.col + 1})");
+            if (!IsXTurn) MovePieceAfterNMoves--;
+
+            return true;
         }
 
         public bool MakeAMove(int row, int col)
