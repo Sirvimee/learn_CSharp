@@ -7,14 +7,11 @@ namespace WebApp.Pages;
 
 public class GameEnded : PageModel
 {
-    private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb();
+    private readonly GameRepositoryDb _gameRepository;
     public TicTacTwoBrain GameInstance { get; set; } = null!;
     
-    [BindProperty(SupportsGet = true)]
-    public string? GameName { get; set; }
-    
-    [BindProperty(SupportsGet = true)]
-    public string? PlayerName { get; set; }
+    [BindProperty(SupportsGet = true)] public string? GameName { get; set; }
+    [BindProperty(SupportsGet = true)] public string? PlayerName { get; set; }
     
     public int DimX { get; set; }
     public int DimY { get; set; }
@@ -25,6 +22,11 @@ public class GameEnded : PageModel
     public string GameType { get; set; } = "Default";
     public string BoardType { get; set; } = "Default";
     
+    public GameEnded(GameRepositoryDb gameRepository)
+    {
+        _gameRepository = gameRepository;
+    }
+    
     public void OnGet()
     {
         LoadGameFromDatabase(GameName!);
@@ -32,7 +34,7 @@ public class GameEnded : PageModel
     
     private void LoadGameFromDatabase(string gameName)
     {
-        var gameStateJson = GameRepo.LoadGame(gameName);
+        var gameStateJson = _gameRepository.LoadGame(gameName);
 
         GameInstance = TicTacTwoBrain.FromJson(gameStateJson);
         GameType = GameInstance.Configuration.GameType;

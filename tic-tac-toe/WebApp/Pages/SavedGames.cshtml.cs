@@ -7,15 +7,17 @@ namespace WebApp.Pages;
 
 public class SavedGames : PageModel
 {
-    [BindProperty(SupportsGet = true)]
-    public string PlayerName { get; set; } = "Default";
+    [BindProperty(SupportsGet = true)] public string PlayerName { get; set; } = "Default";
+    [BindProperty] public string GameName { get; set; } = "Default";
 
-    [BindProperty]
-    public string GameName { get; set; } = "Default";
-
-    private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb();
+    private readonly GameRepositoryDb _gameRepository;
 
     public List<string> SavedGamesList { get; set; } = new List<string>();
+    
+    public SavedGames(GameRepositoryDb gameRepository)
+    {
+        _gameRepository = gameRepository;
+    }
 
     public IActionResult OnGet()
     {
@@ -24,7 +26,7 @@ public class SavedGames : PageModel
             return RedirectToPage("/Index");
         }
 
-        SavedGamesList = GameRepo.GetSavedGames(PlayerName);
+        SavedGamesList = _gameRepository.GetSavedGames(PlayerName);
 
         return Page();
     }

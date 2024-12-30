@@ -6,9 +6,7 @@ namespace WebApp.Pages;
 
 public class IndexModel : PageModel
 {
-    [BindProperty]
-    public string? PlayerName { get; set; } 
-    
+    [BindProperty] public string? PlayerName { get; set; } 
     public string? Error { get; set; }
 
     public IActionResult OnPost()

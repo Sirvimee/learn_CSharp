@@ -5,8 +5,7 @@ namespace WebApp.Pages;
 
 public class Menu : PageModel
 {
-    [BindProperty(SupportsGet = true)] 
-    public string PlayerName { get; set; } = "Default";
+    [BindProperty(SupportsGet = true)] public string PlayerName { get; set; } = "Default";
     
     public IActionResult OnGet()
     {

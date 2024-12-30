@@ -16,7 +16,7 @@ public class Game : PageModel
 
     public TicTacTwoBrain GameInstance { get; set; } = null!;
     public GameConfiguration GameConfig { get; set; } = new GameConfiguration();
-    private static readonly GameRepositoryDb GameRepo = new GameRepositoryDb();
+    private readonly GameRepositoryDb _gameRepository;
 
     public string GameType { get; set; } = "Default";
     public string PlayerName { get; set; } = "Default";
@@ -24,6 +24,11 @@ public class Game : PageModel
 
     [BindProperty(SupportsGet = true)]
     public string? CurrentGameName { get; set; }
+    
+    public Game(GameRepositoryDb gameRepository)
+    {
+        _gameRepository = gameRepository;
+    }
     
     public void OnGet()
     {
@@ -48,20 +53,20 @@ public class Game : PageModel
         {
             if (GameInstance.CheckWin(GameInstance.IsXTurn ? 'X' : 'O'))
             {
-                GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
+                _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
                 return RedirectToPage("./GameEnded", new { 
                     playerName = (GameInstance.IsXTurn ? "X" : "O"), 
                     gameName = CurrentGameName });
             }
             else if (GameInstance.CheckDraw())
             {
-                GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
+                _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
                 return RedirectToPage("./GameEnded", new { gameName = CurrentGameName });
             }
             else
             {
                 GameInstance.IsXTurn = !GameInstance.IsXTurn;
-                GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), null);
+                _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), null);
             }
         }
 
@@ -81,7 +86,7 @@ public class Game : PageModel
 
         if (GameInstance.CheckWin(GameInstance.IsXTurn ? 'X' : 'O'))
         {
-            GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
+            _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
             return RedirectToPage("./GameEnded", new {
                 playerName = (GameInstance.IsXTurn ? "X" : "O"), 
                 gameName = CurrentGameName
@@ -89,13 +94,13 @@ public class Game : PageModel
         }
         else if (GameInstance.CheckDraw())
         {
-            GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
+            _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
             return RedirectToPage("./GameEnded", new { gameName = CurrentGameName });
         }
         else
         {
             GameInstance.IsXTurn = !GameInstance.IsXTurn;
-            GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), null);
+            _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), null);
         }
 
         UpdateBoardDimensions();
@@ -115,7 +120,7 @@ public class Game : PageModel
         {
             if (GameInstance.CheckWin(GameInstance.IsXTurn ? 'X' : 'O'))
             {
-                GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
+                _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
                 return RedirectToPage("./GameEnded", new {
                     playerName = (GameInstance.IsXTurn ? "X" : "O"), 
                     gameName = CurrentGameName
@@ -124,7 +129,7 @@ public class Game : PageModel
             else
             {
                 GameInstance.IsXTurn = !GameInstance.IsXTurn;
-                GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), null);
+                _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), null);
             }
         }
         else
@@ -151,14 +156,14 @@ public class Game : PageModel
         BoardType = GameInstance.Configuration.BoardType;
         GameType = GameInstance.Configuration.GameType;
         PlayerName = GameInstance.Configuration.PlayerName;
-        var gameName = GameRepo.SaveGame(gameState, BoardType, GameType, PlayerName);
+        var gameName = _gameRepository.SaveGame(gameState, BoardType, GameType, PlayerName);
 
         return gameName;
     }
     
     private void LoadGameFromDatabase(string gameName)
     {
-        var gameStateJson = GameRepo.LoadGame(gameName);
+        var gameStateJson = _gameRepository.LoadGame(gameName);
 
         GameInstance = TicTacTwoBrain.FromJson(gameStateJson);
         GameType = GameInstance.Configuration.GameType;
@@ -182,7 +187,7 @@ public class Game : PageModel
     {
         LoadGameFromDatabase(CurrentGameName!);
         var savedGameName = SaveGameToDatabase();
-        GameRepo.DeleteGame(CurrentGameName!);
+        _gameRepository.DeleteGame(CurrentGameName!);
         CurrentGameName = savedGameName;
         return Content($"Game saved successfully with name: {CurrentGameName}");
     }
@@ -226,7 +231,7 @@ public class Game : PageModel
 
         if (GameInstance.CheckWin(GameInstance.IsXTurn ? 'X' : 'O'))
         {
-            GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
+            _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), DateTime.Now);
             return RedirectToPage("./GameEnded", new
             {
                 playerName = (GameInstance.IsXTurn ? "X" : "O"), 
@@ -236,7 +241,7 @@ public class Game : PageModel
         else
         {
             GameInstance.IsXTurn = !GameInstance.IsXTurn;
-            GameRepo.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), null);
+            _gameRepository.UpdateGame(CurrentGameName!, GameInstance.GetGameStateAsJson(), null);
         }
 
         UpdateBoardDimensions();
