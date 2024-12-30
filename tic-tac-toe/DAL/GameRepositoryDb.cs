@@ -20,7 +20,7 @@ public class GameRepositoryDb : IGameRepository
         return game.GameName;
     }
     
-    public void UpdateGame(string gameName, string jsonStateString)
+    public void UpdateGame(string gameName, string jsonStateString, DateTime? deletedAt)
     {
         using var dbContext = new AppDbContextFactory().CreateDbContext(new string[] { });
 
@@ -31,6 +31,7 @@ public class GameRepositoryDb : IGameRepository
         }
 
         game.GameState = jsonStateString;
+        game.DeletedAt = deletedAt;
         dbContext.SaveChanges();
     }
     
@@ -39,7 +40,7 @@ public class GameRepositoryDb : IGameRepository
         using var dbContext = new AppDbContextFactory().CreateDbContext(new string[] { });
 
         return dbContext.Games
-            .Where(g => g.GameName.StartsWith(playerName + " ")) 
+            .Where(g => g.GameName.StartsWith(playerName + " ") && g.DeletedAt == null) 
             .Select(g => g.GameName)
             .Distinct() 
             .ToList();

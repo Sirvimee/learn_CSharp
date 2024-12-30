@@ -1,0 +1,67 @@
+@page
+@model WebApp.Pages.GameEnded
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/game.css" asp-append-version="true">
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(@Model.DimX, 50px);
+            grid-gap: 5px;
+            margin: 20px auto;
+            width: max-content;
+        }
+        .disabled-button {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <form method="post" asp-page-handler="">
+                    <div class="board">
+                        @for (int y = 0; y < Model.DimY; y++)
+                        {
+                            for (int x = 0; x < Model.DimX; x++)
+                            {
+                                var isSmallBoard = x >= Model.SmallBoardStartX && x < Model.SmallBoardEndX &&
+                                                   y >= Model.SmallBoardStartY && y < Model.SmallBoardEndY;
+                                var cssClass = isSmallBoard ? "small-board" : "regular-board";
+                                <button type="submit" name="x" value="@x"
+                                        formaction="/Game?handler=SetPiece&x=@x&y=@y&GameName=@Model.GameName"
+                                        class="@cssClass disabled-button">
+                                    @Model.GameInstance.GameBoard[y][x]
+                                </button>
+                            }
+                        }
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <div class="col-sm text-center">
+                    @if (@Model.PlayerName == null)
+                    {
+                    <h3>Game ended! The game is a draw!</h3>
+                    }
+                    else
+                    {
+                    <h3>Game ended! Player @Model.PlayerName wins!</h3>
+                    }   
+                    <br/>
+                    <form method="post">
+                        <a asp-page="./Index" class="btn btn-primary">Start New Game</a>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>

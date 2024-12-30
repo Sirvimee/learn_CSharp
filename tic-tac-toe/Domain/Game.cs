@@ -9,5 +9,9 @@ public class Game : BaseEntity
     
     [MaxLength(10240)]
     public string GameState { get; set; } = default!;
+    
+    
+    public DateTime? DeletedAt { get; set; }
+    
 
 }
