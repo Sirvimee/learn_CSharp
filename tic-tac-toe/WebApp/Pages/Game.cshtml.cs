@@ -71,17 +71,12 @@ public class Game : PageModel
         }
 
         UpdateBoardDimensions();
-        return Page();
+        return RedirectToPage("./Game", new { CurrentGameName = CurrentGameName });
     }
     
     public IActionResult OnPostAiMove()
     {
-        if (string.IsNullOrEmpty(CurrentGameName))
-        {
-            return Content("Error: CurrentGameName is not set.");
-        }
-
-        LoadGameFromDatabase(CurrentGameName);
+        LoadGameFromDatabase(CurrentGameName!);
         GameInstance.MakeAiMove();
 
         if (GameInstance.CheckWin(GameInstance.IsXTurn ? 'X' : 'O'))
@@ -104,16 +99,11 @@ public class Game : PageModel
         }
 
         UpdateBoardDimensions();
-        return Page();
+        return RedirectToPage("./Game", new { CurrentGameName = CurrentGameName });
     }
     
     public IActionResult OnPostMovePiece(int fromRow, int fromCol, int toRow, int toCol)
     {
-        if (string.IsNullOrEmpty(CurrentGameName))
-        {
-            return Content("Error: CurrentGameName is not set.");
-        }
-
         LoadGameFromDatabase(CurrentGameName!);
 
         if (GameInstance.MovePiece(fromRow, fromCol, toRow, toCol))
@@ -138,7 +128,7 @@ public class Game : PageModel
         }
 
         UpdateBoardDimensions();
-        return Page();
+        return RedirectToPage("./Game", new { CurrentGameName = CurrentGameName });
     }
     
     private void InitializeGame()
@@ -194,12 +184,7 @@ public class Game : PageModel
     
     public IActionResult OnPostMoveGrid(string direction)
     {
-        if (string.IsNullOrEmpty(CurrentGameName))
-        {
-            return Content("Error: CurrentGameName is not set.");
-        }
-
-        LoadGameFromDatabase(CurrentGameName);
+        LoadGameFromDatabase(CurrentGameName!);
 
         switch (direction)
         {
@@ -245,7 +230,7 @@ public class Game : PageModel
         }
 
         UpdateBoardDimensions();
-        return Page();
+        return RedirectToPage("./Game", new { CurrentGameName = CurrentGameName });
     }
     
     public string GetButtonClickHandler(int x, int y) => $"SetPiece({x}, {y})";
