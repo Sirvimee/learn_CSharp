@@ -7,7 +7,8 @@ namespace WebApp.Pages;
 
 public class GameEnded : PageModel
 {
-    private readonly GameRepositoryDb _gameRepository;
+    private readonly GameRepositoryDb _gameRepository; // For Database
+    // private readonly GameRepositoryJson _gameRepository; // For Json
     public TicTacTwoBrain GameInstance { get; set; } = null!;
     
     [BindProperty(SupportsGet = true)] public string? GameName { get; set; }
@@ -27,6 +28,10 @@ public class GameEnded : PageModel
         _gameRepository = gameRepository;
     }
     
+    // public GameEnded(GameRepositoryJson gameRepository)
+    // {
+    //     _gameRepository = gameRepository;
+    // }
     public void OnGet()
     {
         LoadGameFromDatabase(GameName!);

@@ -10,7 +10,8 @@ public class SavedGames : PageModel
     [BindProperty(SupportsGet = true)] public string PlayerName { get; set; } = "Default";
     [BindProperty] public string GameName { get; set; } = "Default";
 
-    private readonly GameRepositoryDb _gameRepository;
+    private readonly GameRepositoryDb _gameRepository; // For Database
+    // private readonly GameRepositoryJson _gameRepository; // For Json
 
     public List<string> SavedGamesList { get; set; } = new List<string>();
     
@@ -18,6 +19,11 @@ public class SavedGames : PageModel
     {
         _gameRepository = gameRepository;
     }
+    
+    // public SavedGames(GameRepositoryJson gameRepository)
+    // {
+    //     _gameRepository = gameRepository;
+    // }
 
     public IActionResult OnGet()
     {

@@ -16,7 +16,8 @@ public class Game : PageModel
 
     public TicTacTwoBrain GameInstance { get; set; } = null!;
     public GameConfiguration GameConfig { get; set; } = new GameConfiguration();
-    private readonly GameRepositoryDb _gameRepository;
+    private readonly GameRepositoryDb _gameRepository; // For Database
+    // private readonly GameRepositoryJson _gameRepository; // For Json
 
     public string GameType { get; set; } = "Default";
     public string PlayerName { get; set; } = "Default";
@@ -24,6 +25,11 @@ public class Game : PageModel
 
     [BindProperty(SupportsGet = true)]
     public string? CurrentGameName { get; set; }
+    
+    // public Game(GameRepositoryJson gameRepository)
+    // {
+    //     _gameRepository = gameRepository;
+    // }
     
     public Game(GameRepositoryDb gameRepository)
     {

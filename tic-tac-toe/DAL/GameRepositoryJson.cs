@@ -21,6 +21,18 @@ namespace DAL
             
             return Path.GetFileNameWithoutExtension(fileName);
         }
+        
+        public void UpdateGame(string gameName, string jsonStateString, DateTime? deletedAt)
+        {
+            var fullPath = FileHelper.BasePath + gameName + FileHelper.GameExtension;
+            File.WriteAllText(fullPath, jsonStateString);
+        }
+        
+        public void DeleteGame(string gameName)
+        {
+            var fullPath = FileHelper.BasePath + gameName + FileHelper.GameExtension;
+            File.Delete(fullPath);
+        }
 
         public List<string?> GetSavedGames(string playerName)
         {

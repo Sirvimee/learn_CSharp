@@ -19,9 +19,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //.AddSingleton<>(); - create new one on first try, all the next requests get existing
 //.AddScoped<>(); - create new one for every web request
 
-//builder.Services.AddScoped<IConfigRepository, ConfigRepositoryJson>();
-builder.Services.AddScoped<IGameRepository, GameRepositoryDb>();
 builder.Services.AddScoped<GameRepositoryDb>();
+// builder.Services.AddScoped<GameRepositoryJson>();
 
 // Add session services
 builder.Services.AddDistributedMemoryCache();
